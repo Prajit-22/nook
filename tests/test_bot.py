@@ -212,7 +212,7 @@ async def test_daily_digest_combines_and_marks():
     sent.clear()
     await nook.run_daily_digest(await store.subscribers())
     combined = sent[0][1]
-    assert "daily Nook digest" in combined
+    assert "Nook letter, sealed and delivered" in combined
     assert "IN YOUR NOOK" in combined and "FRESH OPENINGS" in combined
     assert store.items[1]["read"] == 1 and "r:1" in store.sent_keys
 
