@@ -1,0 +1,12 @@
+[project]
+name = "nook"
+version = "0.1.0"
+description = "Telegram bot on a self-deployed Cloudflare Python Worker: save links all day, wake up to one digest - your reads, summarized and tagged, plus fresh paid openings worth applying to."
+requires-python = ">=3.12"
+dependencies = []
+
+[dependency-groups]
+dev = [
+    "workers-py",
+    "pytest",
+]
