@@ -38,10 +38,10 @@ def test_jobs_section_empty_is_empty_string():
 
 def test_full_digest_combines_sections():
     out = format_digest([item(1)], [job(1)])
-    assert "daily Nook digest" in out
+    assert "Nook letter, sealed and delivered" in out
     assert "IN YOUR NOOK" in out and "FRESH OPENINGS" in out
 
 
 def test_full_digest_empty_state_message():
     out = format_digest([], [])
-    assert "Nothing new" in out and "/jobs" in out
+    assert "pile is empty" in out and "/jobs" in out
