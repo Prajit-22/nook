@@ -10,6 +10,14 @@ from typing import Dict, List, Optional
 DEFAULT_LLM_MODEL = "@cf/meta/llama-3.1-8b-instruct"
 
 
+_STOPWORDS = frozenset(
+    "the a an and or but of to in on for with at by from is are was were be been "
+    "what which who whom whose when where why how can could should would do does "
+    "did have has had i you he she it we they me him her us them my your his their "
+    "this that these those there here about into over under again just not no yes".split()
+)
+
+
 def _py(value):
     """Convert a Pyodide JsProxy into a native Python object when needed.
     Plain Python objects (as in tests/demo) pass straight through."""
@@ -102,21 +110,56 @@ class NookStore:
         plain AND of words so user text can never break FTS5 syntax."""
         words = [w for w in "".join(
             ch if ch.isalnum() else " " for ch in match_query
-        ).split() if len(w) > 2]
+        ).lower().split() if len(w) > 2]
         if not words:
             return []
-        query = " ".join(f'"{w}"' for w in words[:8])
-        rows = _py(
-            await self._db.prepare(
-                "SELECT i.id, i.title, i.url, i.summary, i.content FROM items_fts f"
-                " JOIN items i ON i.id = f.item_id"
-                " WHERE items_fts MATCH ? AND i.chat_id = ?"
-                " ORDER BY bm25(items_fts) LIMIT ?"
-            )
-            .bind(query, chat_id, limit)
-            .all()
+        content_words = [w for w in words if w not in _STOPWORDS] or words
+
+        def _group(word):
+            variants = {word}
+            if word.endswith("s") and len(word) > 3:
+                variants.add(word[:-1])
+            if word.endswith("ies") and len(word) > 4:
+                variants.add(word[:-3] + "y")
+            if len(word) >= 8:
+                variants.add(word[:-3])
+            return "(" + " OR ".join("%s*" % v for v in sorted(variants)) + ")"
+
+        groups = [_group(w) for w in content_words[:8]]
+        sql = (
+            "SELECT i.id, i.title, i.url, i.summary, i.content FROM items_fts f"
+            " JOIN items i ON i.id = f.item_id"
+            " WHERE items_fts MATCH ? AND i.chat_id = ?"
+            " ORDER BY bm25(items_fts) LIMIT ?"
         )
-        return [dict(r) for r in (rows.get("results") if isinstance(rows, dict) else rows) or []]
+        for query in (" AND ".join(groups), " OR ".join(groups)):
+            rows = _py(await self._db.prepare(sql).bind(query, chat_id, limit).all())
+            found = [dict(r) for r in (rows.get("results") if isinstance(rows, dict) else rows) or []]
+            if found:
+                return found
+        return []
+
+    # ---- web auth codes ----------------------------------------------------
+
+    async def create_web_code(self, chat_id: int, code: str) -> None:
+        await self._db.prepare("DELETE FROM web_codes WHERE chat_id = ?").bind(chat_id).run()
+        await self._db.prepare(
+            "INSERT INTO web_codes (chat_id, code, created_at) VALUES (?, ?, datetime('now'))"
+        ).bind(chat_id, code).run()
+
+    async def consume_web_code(self, code: str):
+        """Return the chat_id for a fresh code and burn it; None otherwise."""
+        row = _py(
+            await self._db.prepare(
+                "SELECT chat_id FROM web_codes WHERE code = ?"
+                " AND created_at > datetime('now', '-10 minutes')"
+            ).bind(code).first()
+        )
+        if not row:
+            return None
+        chat_id = int(row["chat_id"])
+        await self._db.prepare("DELETE FROM web_codes WHERE chat_id = ?").bind(chat_id).run()
+        return chat_id
 
     # ---- digest subscriptions --------------------------------------------
 
