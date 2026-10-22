@@ -1,0 +1,35 @@
+name = "nook"
+main = "src/entry.py"
+compatibility_flags = ["python_workers"]
+compatibility_date = "2026-10-21"
+
+# Workers AI (Llama for summaries, tags and answers - no API key needed).
+[ai]
+binding = "AI"
+
+# 1. npx wrangler d1 create nook-db
+# 2. paste the printed database_id below
+# 3. npx wrangler d1 execute nook-db --remote --file=schema.sql
+[[d1_databases]]
+binding = "DB"
+database_name = "nook-db"
+database_id = "71f0c977-7ad6-4884-a172-f44e6d662193"
+
+[vars]
+LLM_MODEL = "@cf/meta/llama-3.1-8b-instruct-fast"
+# Comma-separated Telegram chat ids that may use the bot (recommended!).
+# Find yours by messaging @userinfobot. Empty = anyone who finds the bot.
+ALLOWED_CHAT_IDS = ""
+# Job digest tuning: comma-separated keywords matched against title+tags,
+# and the local hour (0-23, IST by default) the daily digest fires.
+JOB_KEYWORDS = "backend,python,llm,ai,genai,machine learning,full stack,forward deployed,intern,junior,fresher,entry level"
+DIGEST_HOUR_UTC = "2"   # 02:30 UTC cron fires, digest is built around 08:00 IST
+MAX_JOBS_IN_DIGEST = "6"
+MAX_READS_IN_DIGEST = "5"
+
+[triggers]
+crons = ["30 2 * * *"]   # 08:00 IST, every day
+
+# Secrets (never in git):
+#   npx wrangler secret put TELEGRAM_BOT_TOKEN       (from @BotFather)
+#   npx wrangler secret put TELEGRAM_WEBHOOK_SECRET  (any long random string)
