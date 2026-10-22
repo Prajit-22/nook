@@ -22,7 +22,7 @@ import jobs as joblib
 from bot import Nook
 from store import NookStore
 from telegram_api import api_url, build_send_payload, parse_update, split_message, verify_secret
-from web import LANDING_HTML
+from web import LANDING_HTML, NOT_FOUND_HTML, SERVER_ERROR_HTML
 
 USER_AGENT = "nook-bot/0.1 (+https://github.com/Prajit-22/nook)"
 FETCH_HEADERS = {"User-Agent": USER_AGENT, "Accept": "text/html,application/json"}
@@ -35,17 +35,35 @@ def _js(value):
 
 class Default(WorkerEntrypoint):
     async def fetch(self, request):
+        try:
+            return await self._route(request)
+        except Exception:
+            return Response(
+                SERVER_ERROR_HTML,
+                status=500,
+                headers={"content-type": "text/html; charset=utf-8"},
+            )
+
+    async def _route(self, request):
         after_host = request.url.split("://", 1)[-1]
         path = "/" + after_host.split("/", 1)[1] if "/" in after_host else "/"
         path = path.split("?")[0].rstrip("/") or "/"
         if request.method == "GET":
             if path == "/health":
-                return Response("ok")
+                return Response("ok", headers={"cache-control": "no-store"})
             if path == "/":
-                return Response(LANDING_HTML, headers={"content-type": "text/html; charset=utf-8"})
-            return Response("not found", status=404)
+                return Response(
+                    LANDING_HTML,
+                    headers={
+                        "content-type": "text/html; charset=utf-8",
+                        "cache-control": "public, max-age=300",
+                        "x-content-type-options": "nosniff",
+                        "referrer-policy": "strict-origin-when-cross-origin",
+                    },
+                )
+            return self._not_found()
         if request.method != "POST" or not path.endswith("/webhook"):
-            return Response("not found", status=404)
+            return self._not_found()
 
         provided = request.headers.get("X-Telegram-Bot-Api-Secret-Token")
         if not verify_secret(provided, self.env.TELEGRAM_WEBHOOK_SECRET):
@@ -65,6 +83,13 @@ class Default(WorkerEntrypoint):
         # finishes in the background and replies go out via sendMessage.
         self.ctx.waitUntil(self._guarded(update))
         return Response("ok")
+
+    def _not_found(self):
+        return Response(
+            NOT_FOUND_HTML,
+            status=404,
+            headers={"content-type": "text/html; charset=utf-8"},
+        )
 
     async def scheduled(self, event):
         store = self._store()
