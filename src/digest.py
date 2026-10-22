@@ -39,7 +39,7 @@ def format_jobs_section(jobs) -> str:
 
 
 def format_digest(unread_items, jobs, reads_limit=5) -> str:
-    parts = ["Good morning. Your daily Nook digest:"]
+    parts = ["Good morning - your daily Nook digest, sealed and delivered:"]
     reads = format_reads_section(unread_items, limit=reads_limit)
     jobs_text = format_jobs_section(jobs)
     if reads:
@@ -52,9 +52,9 @@ def format_digest(unread_items, jobs, reads_limit=5) -> str:
 
 
 WELCOME = (
-    "This is Nook, your reading corner on Telegram. Toss links into your nook all day - I fetch, summarize and tag "
-    "every one. Each morning you get one digest: your unread reads plus "
-    "fresh paid openings that match you.\n\n"
+    "Nook here - your reading corner on Telegram, kept by a magpie. Toss links into your nook "
+    "all day and I will fetch, summarize and tag every one. Each morning I deliver one sealed "
+    "letter: your unread reads, plus fresh paid openings that match you.\n\n"
     "- Send any link to save it\n"
     "- Ask a question in plain words to search your nook\n"
     "- /note <text> saves a thought instead\n"
