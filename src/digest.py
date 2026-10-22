@@ -16,7 +16,7 @@ def format_reads_section(unread_items, limit=5) -> str:
         if item.get("url"):
             lines.append(item["url"])
     if len(unread_items) > limit:
-        lines.append(f"\n...and {len(unread_items) - limit} more. /reads for the rest.")
+        lines.append(f"\n...and {len(unread_items) - limit} more on the pile. /reads for the rest.")
     return "\n".join(lines)
 
 
@@ -39,7 +39,7 @@ def format_jobs_section(jobs) -> str:
 
 
 def format_digest(unread_items, jobs, reads_limit=5) -> str:
-    parts = ["Good morning - your daily Nook digest, sealed and delivered:"]
+    parts = ["Good morning. Your Nook letter, sealed and delivered:"]
     reads = format_reads_section(unread_items, limit=reads_limit)
     jobs_text = format_jobs_section(jobs)
     if reads:
@@ -47,21 +47,24 @@ def format_digest(unread_items, jobs, reads_limit=5) -> str:
     if jobs_text:
         parts.append(jobs_text)
     if not reads and not jobs_text:
-        parts.append("Nothing new in your nook and no fresh matching openings today. /jobs to re-check on demand.")
+        parts.append("The pile is empty and no matching openings came in overnight. /jobs to re-check on demand.")
+    parts.append("- your magpie")
     return "\n\n".join(parts)
 
 
 WELCOME = (
-    "Nook here - your reading corner on Telegram, kept by a magpie. Toss links into your nook "
-    "all day and I will fetch, summarize and tag every one. Each morning I deliver one sealed "
-    "letter: your unread reads, plus fresh paid openings that match you.\n\n"
+    "Nook here. A reading corner on Telegram, kept by a magpie.\n\n"
+    "Toss links at me all day - I fetch each page, write a two-sentence summary, "
+    "tag it, and file it. Every morning at 08:00 you get one sealed letter: your "
+    "unread reads, plus fresh paid openings matched to you.\n\n"
+    "How it works:\n"
     "- Send any link to save it\n"
-    "- Ask a question in plain words to search your nook\n"
+    "- Ask a question in plain words to search your nook, with sources\n"
     "- /note <text> saves a thought instead\n"
-    "- /jobs for fresh openings now, /reads for your unread nook\n"
-    "- /list recent saves, /forget <id> to delete one\n"
-    "- /stop pauses the morning digest\n\n"
-    "You are subscribed to the daily digest."
+    "- /jobs fresh openings now, /reads your unread pile now\n"
+    "- /list recent saves, /forget <id> removes one\n"
+    "- /stop pauses the morning letter, /start resumes it\n\n"
+    "You are subscribed to the daily letter."
 )
 
 HELP = (
