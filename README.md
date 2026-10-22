@@ -1,5 +1,11 @@
 # Nook
 
+<p align="center">
+  <img src="https://nook.prjtchaturvedi.workers.dev/brand/mark.png" width="140" alt="Nook logo">
+</p>
+
+**Live: [nook.prjtchaturvedi.workers.dev](https://nook.prjtchaturvedi.workers.dev) - bot: [@Nook_digest_bot](https://t.me/Nook_digest_bot)**
+
 **Your reading nook on Telegram. Toss links at it all day; wake up to one digest - your reads summarized, plus fresh paid openings worth applying to.**
 
 A Telegram bot you deploy to your own Cloudflare account as a pure-Python Worker. It fetches every link you send it, summarizes and tags it with Workers AI, answers questions over your saved links with sources, and sends a single morning digest: your unread reads + new paid job openings matched to your keywords, pulled live from public job boards at send time.
