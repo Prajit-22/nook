@@ -54,10 +54,15 @@ def parse_update(body: dict):
     return Update(chat_id=chat_id, text=text)
 
 
-def build_send_payload(chat_id: int, text: str) -> dict:
+def build_send_payload(chat_id: int, text: str, url_button=None) -> dict:
     """Plain text only: URLs in the body still auto-link in Telegram, and we
-    never have to worry about Markdown-escaping user content."""
-    return {"chat_id": chat_id, "text": text}
+    never have to worry about Markdown-escaping user content. url_button is an
+    optional (label, url) pair rendered as one inline keyboard button."""
+    payload = {"chat_id": chat_id, "text": text}
+    if url_button:
+        label, url = url_button
+        payload["reply_markup"] = {"inline_keyboard": [[{"text": label, "url": url}]]}
+    return payload
 
 
 def split_message(text: str, limit: int = MAX_MESSAGE_LEN):
