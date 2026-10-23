@@ -211,7 +211,7 @@ APP_HTML = """<!doctype html>
 <div class="wrap">
 <header>
   <div class="brand"><img src="/brand/mark.png" alt="Nook"><span class="word">Nook</span></div>
-  <a class="btn" href="https://t.me/Nook_digest_bot">Bot</a>
+  <div style="display:flex;gap:8px"><a class="btn" href="https://t.me/Nook_digest_bot">Bot</a><a class="btn" href="/app/logout">Sign out</a></div>
 </header>
 
 <div class="bar">
