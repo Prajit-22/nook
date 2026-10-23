@@ -57,6 +57,7 @@ cron (08:00 IST) ─▶ bot.run_daily_digest ─▶ one message per subscriber
 
    ```bash
    git clone https://github.com/Prajit-22/nook && cd nook
+   python3 tools/brand_assets.py         # materialize docs/brand/* (base64 in repo, hashes pinned)
    npx wrangler d1 create nook-db          # paste the database_id into wrangler.toml
    npx wrangler d1 execute nook-db --remote --file=schema.sql
    ```
