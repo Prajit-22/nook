@@ -96,3 +96,29 @@ def test_select_jobs_limit():
     many = [dict(parse_remoteok(REMOTEOK_PAYLOAD)[0], key=f"k{i}", title=f"Intern {i}")
             for i in range(20)]
     assert len(select_jobs(many, parse_keywords("intern"), limit=6)) == 6
+
+
+def test_quality_screen_rejects_gibberish_and_senior():
+    from jobs import is_plausible, is_fresher_relevant
+
+    assert not is_plausible({"title": "lkjlkgxcv", "company": "scvsdv"})
+    assert not is_plausible({"title": "Backend Engineer", "company": "xqwrtz"})
+    assert is_plausible({"title": "Backend Engineer", "company": "Supabase"})
+    assert not is_fresher_relevant({"title": "Senior Backend Engineer"})
+    assert not is_fresher_relevant({"title": "Head of Technology"})
+    assert not is_fresher_relevant({"title": "Software Engineer III"})
+    assert is_fresher_relevant({"title": "Leadership Development Intern"})
+    assert is_fresher_relevant({"title": "Junior Python Developer"})
+
+
+def test_select_jobs_drops_gibberish_and_senior():
+    feed = [
+        {"key": "a", "title": "lkjlkgxcv", "company": "scvsdv",
+         "url": "https://x", "salary": "$60k-$210k/yr", "tags": ["python"], "date": "2026-10-23"},
+        {"key": "b", "title": "Senior Backend Engineer", "company": "DuckDuckGo",
+         "url": "https://x", "salary": "$190k-$190k/yr", "tags": ["backend"], "date": "2026-10-23"},
+        {"key": "c", "title": "Junior Backend Engineer", "company": "Acme",
+         "url": "https://x", "salary": "$60k-$80k/yr", "tags": ["backend"], "date": "2026-10-22"},
+    ]
+    picked = select_jobs(feed, ["backend", "python"], paid_only=True)
+    assert [j["key"] for j in picked] == ["c"]
