@@ -35,7 +35,8 @@ class Nook:
         cmd, rest = self._split_command(text)
         if cmd == "start":
             await self._store.subscribe(chat_id)
-            await self._send(chat_id, dg.WELCOME)
+            await self._send(chat_id, dg.WELCOME,
+                             url_button=("Open Nook", dg.APP_URL + "/app"))
         elif cmd in ("help", "commands"):
             await self._send(chat_id, dg.HELP)
         elif cmd == "stop":
@@ -153,15 +154,18 @@ class Nook:
     # ---- digests (on-demand and cron) -------------------------------------
 
     async def _web_code(self, chat_id: int) -> None:
-        import secrets, string
-        alphabet = string.ascii_uppercase + string.digits
+        import secrets
+        # No 0/O, 1/I/L - every code reads the same in any font.
+        alphabet = "ABCDEFGHJKMNPQRSTUVWXYZ23456789"
         code = "".join(secrets.choice(alphabet) for _ in range(6))
         await self._store.create_web_code(chat_id, code)
+        link = dg.APP_URL + "/app?key=" + code
         await self._send(
             chat_id,
-            "Your Nook web key: " + code + "\n"
-            "Good for ten minutes at nook.prjtchaturvedi.workers.dev/app - "
-            "ask again with /web for a fresh one.",
+            "One tap and you are in - the button below signs you in on this device.\n"
+            "On a laptop, open " + dg.APP_URL + "/app and type " + code + ".\n"
+            "Good for ten minutes, one use - ask again with /web for a fresh one.",
+            url_button=("Open Nook", link),
         )
 
     async def send_reads_digest(self, chat_id: int, mark_read=True) -> None:
