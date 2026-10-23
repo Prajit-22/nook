@@ -125,8 +125,8 @@ nav.tabs button.on { color:var(--ink); border-bottom-color:var(--wax); }
 .clip h3 a { color:var(--ink); text-decoration:none; border-bottom:1px solid transparent; }
 .clip h3 a:hover { border-bottom-color:var(--wax); }
 .clip p { font-size:13.5px; color:var(--ink-soft); line-height:1.55; }
-.clip .tags { margin-top:10px; font-family:'IBM Plex Mono',monospace; font-size:10.5px; color:var(--ink-faint); }
-.clip .tags span { border:1px solid var(--rule-soft); padding:2px 8px; margin-right:5px; }
+.clip .tags { display:flex; flex-wrap:wrap; gap:6px; margin-top:10px; font-family:'IBM Plex Mono',monospace; font-size:10.5px; color:var(--ink-faint); }
+.clip .tags span { border:1px solid var(--rule-soft); padding:2px 8px; }
 .bar { display:flex; gap:10px; margin-bottom:24px; }
 .bar input { flex:1; font-family:'IBM Plex Mono',monospace; font-size:14px; padding:12px 16px; border:1px solid var(--rule);
   background:var(--card); color:var(--ink); outline:none; }
@@ -148,6 +148,14 @@ nav.tabs button.on { color:var(--ink); border-bottom-color:var(--wax); }
 .job a { color:var(--ink); }
 .job .meta { font-family:'IBM Plex Mono',monospace; font-size:11.5px; color:var(--ink-soft); margin-top:6px; }
 .spinner { text-align:center; padding:50px; font-family:'IBM Plex Mono',monospace; font-size:13px; color:var(--ink-faint); }
+.askwrap { max-width:640px; margin:0 auto; }
+.askintro { font-size:15px; color:var(--ink-soft); line-height:1.6; margin-bottom:18px; }
+.chips { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:22px; }
+.chip { font-family:'IBM Plex Mono',monospace; font-size:11.5px; color:var(--ink-soft); border:1px solid var(--rule); background:none; padding:7px 12px; cursor:pointer; transition:all .25s var(--ease); }
+.chip:hover { border-color:var(--wax); color:var(--wax); }
+.feednote { font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--ink-faint); letter-spacing:.04em; margin:2px 0 18px; }
+.srcs { font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--ink-faint); margin-top:14px; }
+.srcs a { color:var(--ink-soft); }
 @media (max-width:640px){ .grid { grid-template-columns:1fr; } }
 """
 
@@ -162,13 +170,17 @@ LOGIN_HTML = """<!doctype html>
 .login .bar { margin-top:28px; }
 .login input { text-align:center; letter-spacing:.3em; text-transform:uppercase; }
 .login .err { color:#A4452B; font-family:'IBM Plex Mono',monospace; font-size:12.5px; margin-top:12px; min-height:1.2em; }
-.login code { font-family:'IBM Plex Mono',monospace; background:rgba(23,19,12,.07); padding:2px 8px; }
+.login a { color:inherit; }
+.login .btn.big { display:inline-block; margin-top:8px; padding:15px 30px; font-size:13px; text-decoration:none; }
+.login .how { font-size:13.5px; color:var(--ink-faint); margin-top:14px; }
 </style></head>
 <body><div class="wrap"><div class="login">
 <img src="/brand/mark.png" alt="Nook">
 <h1>Open your nook.</h1>
-<p>Ask the bot for a key: send <code>/web</code> to <a href="https://t.me/Nook_digest_bot">@Nook_digest_bot</a> and it will DM you a 6-letter code, good for ten minutes.</p>
-<form class="bar" id="f"><input id="code" maxlength="6" autocomplete="one-time-code" placeholder="ABC123"><button class="btn primary" type="submit">Open</button></form>
+<p>One tap in Telegram and the bot hands you a key.</p>
+<a class="btn primary big" href="https://t.me/Nook_digest_bot?start=webkey">Get a key from the bot</a>
+<p class="how">It DMs back a 6-letter key - and on your phone, a one-tap button that signs you in outright.</p>
+<form class="bar" id="f"><input id="code" maxlength="6" autocomplete="one-time-code" placeholder="ABC123"><button class="btn" type="submit">Open</button></form>
 <div class="err" id="err"></div>
 <p class="note">no password, no email - the bot already knows you</p>
 </div></div>
@@ -176,7 +188,7 @@ LOGIN_HTML = """<!doctype html>
 async function tryCode(code) {
   const r = await fetch('/app/login', { method: 'POST', headers: {'content-type':'application/json'}, body: JSON.stringify({code}) });
   if (r.ok) { location.href = '/app'; }
-  else { document.getElementById('err').textContent = 'That code did not work. Keys last ten minutes and work once - send /web to @Nook_digest_bot for a new one.'; }
+  else { document.getElementById('err').textContent = 'That code did not work. Keys last ten minutes and work once - tap the button above for a fresh one.'; }
 }
 document.getElementById('f').addEventListener('submit', (e) => {
   e.preventDefault();
@@ -239,11 +251,21 @@ async function load(tab) {
       <p style="font-family:Newsreader,serif;font-style:italic;color:var(--ink-soft);margin-top:22px">- your magpie</p></div>`;
   } else if (tab === 'jobs') {
     const jobs = await (await fetch('/api/jobs')).json();
-    main.innerHTML = jobs.length ? jobs.map(j => `<div class="job"><b><a href="${esc(j.url)}">${esc(j.title)}</a></b> @ ${esc(j.company)}<div class="meta">${esc(j.salary)} &middot; ${esc((j.url||'').replace(/^https?:\\/\\//,'').split('/')[0])}</div></div>`).join('') : '<div class="empty">No fresh openings right now.</div>';
+    const rows = jobs.map(j => `<div class="job"><b><a href="${esc(j.url)}">${esc(j.title)}</a></b> @ ${esc(j.company)}<div class="meta">${esc(j.salary)} &middot; ${esc((j.url||'').replace(/^https?:\\/\\//,'').split('/')[0])}</div></div>`).join('');
+    main.innerHTML = '<p class="feednote">Live from RemoteOK + Remotive at open. Paid listings matched to your fresher-dev keywords, cross-posts merged.</p>' + (jobs.length ? rows : '<div class="empty">No fresh openings right now.</div>');
   } else if (tab === 'ask') {
-    main.innerHTML = `<div class="bar"><input id="q" placeholder="Ask your nook anything..."><button class="btn primary" id="askbtn">Ask</button></div><div id="ans"></div>`;
+    main.innerHTML = `<div class="askwrap">
+      <p class="askintro">Ask across everything you have filed. The magpie answers from your own clippings and notes, and names its sources.</p>
+      <div class="bar"><input id="q" placeholder="Ask your nook anything..."><button class="btn primary" id="askbtn">Ask</button></div>
+      <div class="chips">
+        <button class="chip">Summarize my unread reads</button>
+        <button class="chip">What did I save about AI?</button>
+        <button class="chip">What themes keep coming up in my nook?</button>
+      </div>
+      <div id="ans"></div></div>`;
     document.getElementById('askbtn').onclick = ask;
     document.getElementById('q').addEventListener('keydown', (e) => { if (e.key === 'Enter') ask(); });
+    document.querySelectorAll('.chip').forEach(c => c.onclick = () => { document.getElementById('q').value = c.textContent; ask(); });
   }
 }
 async function ask() {
@@ -251,7 +273,8 @@ async function ask() {
   if (!q) return;
   document.getElementById('ans').innerHTML = '<div class="spinner">the magpie is thinking...</div>';
   const r = await (await fetch('/api/ask?q=' + encodeURIComponent(q))).json();
-  document.getElementById('ans').innerHTML = `<div class="answer"><div class="q">${esc(q)}</div>${esc(r.answer).replace(/\\n/g,'<br>')}</div>`;
+  const srcs = (r.sources || []).map(x => `<a href="${esc(x.url)}">#${x.id} ${esc(x.title)}</a>`).join(' &middot; ');
+  document.getElementById('ans').innerHTML = `<div class="answer"><div class="q">${esc(q)}</div>${esc(r.answer).replace(/\\n/g,'<br>')}${srcs ? `<div class="srcs">${srcs}</div>` : ''}</div>`;
 }
 document.querySelectorAll('nav.tabs button').forEach(b => b.onclick = () => load(b.dataset.tab));
 document.getElementById('savebtn').onclick = async () => {
