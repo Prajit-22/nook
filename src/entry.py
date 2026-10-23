@@ -23,6 +23,10 @@ from bot import Nook
 from store import NookStore
 from telegram_api import api_url, build_send_payload, parse_update, split_message, verify_secret
 from web import LANDING_HTML, NOT_FOUND_HTML, SERVER_ERROR_HTML
+from webapp import (
+    APP_HTML, LOGIN_HTML, MANIFEST, SERVICE_WORKER, SESSION_COOKIE,
+    session_from_headers, sign_session,
+)
 
 USER_AGENT = "nook-bot/0.1 (+https://github.com/Prajit-22/nook)"
 FETCH_HEADERS = {"User-Agent": USER_AGENT, "Accept": "text/html,application/json"}
@@ -37,7 +41,8 @@ class Default(WorkerEntrypoint):
     async def fetch(self, request):
         try:
             return await self._route(request)
-        except Exception:
+        except Exception as exc:
+            print("route failed: %r" % (exc,))
             return Response(
                 SERVER_ERROR_HTML,
                 status=500,
@@ -61,7 +66,33 @@ class Default(WorkerEntrypoint):
                         "referrer-policy": "strict-origin-when-cross-origin",
                     },
                 )
+            if path == "/app/manifest.webmanifest":
+                return Response(json.dumps(MANIFEST), headers={
+                    "content-type": "application/manifest+json", "cache-control": "no-store"})
+            if path == "/app/sw.js":
+                return Response(SERVICE_WORKER, headers={
+                    "content-type": "application/javascript", "cache-control": "no-store"})
+            if path in ("/app", "/share"):
+                chat_id = self._session_chat(request)
+                if chat_id is None:
+                    return self._html(LOGIN_HTML)
+                if path == "/share":
+                    qs = request.url.split("?", 1)[1] if "?" in request.url else ""
+                    return Response.redirect("/app?" + qs, 302)
+                return self._html(APP_HTML, cache="no-store")
+            if path == "/api/reads":
+                return await self._api(request, self._api_reads)
+            if path == "/api/ask":
+                return await self._api(request, self._api_ask)
+            if path == "/api/digest":
+                return await self._api(request, self._api_digest)
+            if path == "/api/jobs":
+                return await self._api(request, self._api_jobs)
             return self._not_found()
+        if path == "/app/login" and request.method == "POST":
+            return await self._login(request)
+        if path == "/api/save" and request.method == "POST":
+            return await self._api_save(request)
         if request.method != "POST" or not path.endswith("/webhook"):
             return self._not_found()
 
@@ -83,6 +114,115 @@ class Default(WorkerEntrypoint):
         # finishes in the background and replies go out via sendMessage.
         self.ctx.waitUntil(self._guarded(update))
         return Response("ok")
+
+    # ---- web app -----------------------------------------------------------
+
+    def _html(self, body, cache=None):
+        headers = {"content-type": "text/html; charset=utf-8",
+                   "x-content-type-options": "nosniff"}
+        headers["cache-control"] = cache or "no-store"
+        return Response(body, headers=headers)
+
+    def _session_chat(self, request):
+        return session_from_headers(
+            request.headers.get("cookie") or "", self.env.TELEGRAM_WEBHOOK_SECRET)
+
+    async def _login(self, request):
+        try:
+            body = await request.json()
+            if hasattr(body, "to_py"):
+                body = body.to_py()
+        except Exception:
+            body = {}
+        code = str(body.get("code", "")).strip().upper() if isinstance(body, dict) else ""
+        if not code:
+            return Response("bad code", status=400)
+        chat_id = await self._store().consume_web_code(code)
+        if chat_id is None:
+            return Response("bad code", status=403)
+        token = sign_session(chat_id, self.env.TELEGRAM_WEBHOOK_SECRET)
+        return Response("ok", headers={
+            "set-cookie": "%s=%s; Path=/; Max-Age=%d; HttpOnly; Secure; SameSite=Lax"
+            % (SESSION_COOKIE, token, 30 * 24 * 3600)})
+
+    async def _api(self, request, handler):
+        chat_id = self._session_chat(request)
+        if chat_id is None:
+            return Response('{"error":"sign in first"}', status=401,
+                            headers={"content-type": "application/json"})
+        try:
+            payload = await handler(chat_id, request)
+        except Exception as exc:
+            print("api failed: %r" % (exc,))
+            return Response('{"error":"dropped it"}', status=500,
+                            headers={"content-type": "application/json"})
+        return Response(json.dumps(payload), headers={
+            "content-type": "application/json", "cache-control": "no-store"})
+
+    async def _api_reads(self, chat_id, request):
+        return await self._store().list_items(chat_id, limit=100)
+
+    async def _api_ask(self, chat_id, request):
+        from urllib.parse import urlparse, parse_qs
+        q = parse_qs(urlparse(request.url).query).get("q", [""])[0].strip()
+        if not q:
+            return {"answer": "Ask me something first."}
+        store = self._store()
+        results = await store.fts_search(chat_id, q, limit=4)
+        if not results:
+            return {"answer": "Nothing in your nook matches that yet. Save a few links first."}
+        context = "\n\n".join(
+            "#%d %s (%s)\n%s" % (r["id"], r["title"], r["url"], (r["summary"] or r["content"][:500]))
+            for r in results)
+        answer = await store.chat([
+            {"role": "system", "content":
+             "You are Nook, a magpie keeping the user's reading pile. Answer only from the "
+             "clippings below, cite them as #id, two short paragraphs max."},
+            {"role": "user", "content": "Clippings:\n" + context + "\n\nQuestion: " + q},
+        ])
+        return {"answer": answer, "sources": [{"id": r["id"], "title": r["title"], "url": r["url"]} for r in results]}
+
+    async def _fresh_jobs(self, chat_id):
+        store = self._store()
+        feed = await self._fetch_jobs_feed()
+        seen = await store.sent_job_keys(chat_id)
+        return joblib.select_jobs(
+            feed, self.env.JOB_KEYWORDS, paid_only=True,
+            limit=int(self.env.MAX_JOBS_IN_DIGEST or "6"), exclude_keys=seen)
+
+    async def _api_jobs(self, chat_id, request):
+        return await self._fresh_jobs(chat_id)
+
+    async def _api_digest(self, chat_id, request):
+        store = self._store()
+        return {"reads": await store.unread_items(chat_id),
+                "jobs": await self._fresh_jobs(chat_id)}
+
+    async def _api_save(self, request):
+        chat_id = self._session_chat(request)
+        if chat_id is None:
+            return Response('{"error":"sign in first"}', status=401,
+                            headers={"content-type": "application/json"})
+        try:
+            body = await request.json()
+            if hasattr(body, "to_py"):
+                body = body.to_py()
+        except Exception:
+            body = {}
+        url = str(body.get("url", "")).strip() if isinstance(body, dict) else ""
+        if not url.startswith(("http://", "https://")):
+            return Response('{"error":"that is not a link"}', status=400,
+                            headers={"content-type": "application/json"})
+
+        async def silent_save():
+            async def noop(*a, **k):
+                return None
+            bot = self._bot(self._store())
+            bot._send = noop
+            await bot._save_link(chat_id, url)
+        self.ctx.waitUntil(silent_save())
+        return Response('{"ok":true}', status=202,
+                        headers={"content-type": "application/json"})
 
     def _not_found(self):
         return Response(
