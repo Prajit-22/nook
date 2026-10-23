@@ -56,6 +56,8 @@ class Nook:
             await self._list(chat_id)
         elif cmd == "forget":
             await self._forget(chat_id, rest)
+        elif cmd == "web":
+            await self._web_code(update.chat_id)
         elif cmd == "ask":
             await self._answer(chat_id, rest)
         elif cmd is not None:
@@ -149,6 +151,18 @@ class Nook:
             await self._send(chat_id, f"No #{item_id} in your nook.")
 
     # ---- digests (on-demand and cron) -------------------------------------
+
+    async def _web_code(self, chat_id: int) -> None:
+        import secrets, string
+        alphabet = string.ascii_uppercase + string.digits
+        code = "".join(secrets.choice(alphabet) for _ in range(6))
+        await self._store.create_web_code(chat_id, code)
+        await self._send(
+            chat_id,
+            "Your Nook web key: " + code + "\n"
+            "Good for ten minutes at nook.prjtchaturvedi.workers.dev/app - "
+            "ask again with /web for a fresh one.",
+        )
 
     async def send_reads_digest(self, chat_id: int, mark_read=True) -> None:
         unread = await self._store.unread_items(chat_id)
