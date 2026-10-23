@@ -95,6 +95,52 @@ def is_early_career(job: dict) -> bool:
     return any(term in haystack for term in EARLY_CAREER_TERMS)
 
 
+# Title words that mark a role as not fresher-relevant.
+SENIOR_WORDS = frozenset(
+    "senior sr staff principal lead head director vp manager architect "
+    "chief distinguished iii iv".split()
+)
+SENIOR_PHRASES = ("vice president", "sde 3", "sde iii")
+
+_VOWELS = set("aeiou")
+
+
+def _token_gibberish(token: str) -> bool:
+    """A long token with no vowels or a 5+ consonant run is keyboard mash,
+    not a word ('lkjlkgxcv', 'scvsdv'). Short acronyms (SQL, HR) pass."""
+    t = "".join(ch for ch in token.lower() if ch.isalpha())
+    if len(t) < 5:
+        return False
+    if not _VOWELS.intersection(t):
+        return True
+    run = 0
+    for ch in t:
+        run = run + 1 if ch not in _VOWELS and ch != "y" else 0
+        if run >= 5:
+            return True
+    return False
+
+
+def is_plausible(job: dict) -> bool:
+    """Reject listings whose title or company looks like keyboard mash."""
+    for field in ("title", "company"):
+        for token in str(job.get(field, "")).split():
+            if _token_gibberish(token):
+                return False
+    return True
+
+
+def is_fresher_relevant(job: dict) -> bool:
+    """A role is fresher-relevant unless its title marks it senior-only."""
+    import re
+
+    words = re.findall(r"[a-z0-9]+", str(job.get("title", "")).lower())
+    if SENIOR_WORDS.intersection(words):
+        return False
+    joined = " ".join(words)
+    return not any(phrase in joined for phrase in SENIOR_PHRASES)
+
+
 def select_jobs(jobs, keywords, paid_only=True, limit=6, exclude_keys=frozenset()):
     """Filter to paid, keyword-matching, unsent openings; early-career first,
     newest next; dedup by (title, company) so cross-posted roles appear once."""
@@ -106,6 +152,8 @@ def select_jobs(jobs, keywords, paid_only=True, limit=6, exclude_keys=frozenset(
         if job.get("key") in exclude_keys:
             continue
         if paid_only and not job.get("salary"):
+            continue
+        if not is_plausible(job) or not is_fresher_relevant(job):
             continue
         if keywords and not matches(job, keywords):
             continue
