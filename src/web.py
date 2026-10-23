@@ -1,6 +1,6 @@
-"""Landing page served at GET / - editorial ink style, in the Memetic spirit:
-cream paper, forest-green ink, one amber accent, serif display + mono margin
-notes, hand-drawn SVG illustration, scroll-driven diagram, load choreography.
+"""Landing page served at GET / - editorial grid style: light paper, warm ink,
+one sealing-wax accent, condensed display + reading serif + mono metadata,
+hairline rules, numbered rows, a dense morning-letter mock, load choreography.
 Brand images are served from the worker's static assets."""
 
 _BRAND = "/brand"
@@ -18,20 +18,21 @@ LANDING_HTML = """<!doctype html>
 <meta property="og:description" content="Toss links in all day. Wake up to one sealed letter: your reads, summarized, plus fresh paid openings.">
 <meta property="og:image" content="https://nook.prjtchaturvedi.workers.dev__BRAND__/og.png">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="theme-color" content="#F6F1E5">
+<meta name="theme-color" content="#F8F5EE">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=IBM+Plex+Mono:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400;1,6..72,500&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 :root {
-  --paper: #F6F1E5;
-  --paper-2: #EFead9;
-  --ink: #1E3D2F;
-  --ink-soft: #43614F;
-  --ink-faint: #7b8f82;
-  --wax: #E8A33D;
-  --rule: rgba(30, 61, 47, .22);
-  --rule-soft: rgba(30, 61, 47, .12);
+  --paper: #F8F5EE;
+  --card: #FFFDF6;
+  --ink: #17130C;
+  --ink-70: rgba(23, 19, 12, .7);
+  --ink-55: rgba(23, 19, 12, .55);
+  --ink-35: rgba(23, 19, 12, .35);
+  --wax: #C2491D;
+  --rule: rgba(23, 19, 12, .16);
+  --rule-strong: rgba(23, 19, 12, .9);
   --ease-out: cubic-bezier(.22, 1, .36, 1);
   --ease-spring: cubic-bezier(.2, 1.5, .35, 1);
 }
@@ -40,33 +41,31 @@ html { scroll-behavior: smooth; }
 body {
   background: var(--paper);
   color: var(--ink);
-  font-family: Georgia, 'Times New Roman', serif;
-  font-size: 16px;
+  font-family: 'Newsreader', Georgia, serif;
+  font-size: 17px;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
 }
-.serif { font-family: 'Fraunces', Georgia, serif; }
+.display { font-family: 'Oswald', 'Arial Narrow', sans-serif; }
 .mono { font-family: 'IBM Plex Mono', ui-monospace, monospace; }
+.page { position: relative; z-index: 1; max-width: 1180px; margin: 0 auto; padding: 0 28px; }
+::selection { background: rgba(194, 73, 29, .28); }
+a { color: inherit; }
+a:focus-visible, button:focus-visible { outline: 2px solid var(--wax); outline-offset: 3px; }
+img { user-select: none; }
 
-/* paper grain + faint top rule */
-body::before {
-  content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 0;
-  background-image: radial-gradient(rgba(30,61,47,.05) 1px, transparent 1px);
-  background-size: 22px 22px;
-}
-.page { position: relative; z-index: 1; max-width: 1120px; margin: 0 auto; padding: 0 28px; }
-
-::selection { background: rgba(232,163,61,.4); }
+/* the punctuation square - one wax mark, used sparingly */
+.sq { display: inline-block; width: .2em; height: .2em; background: var(--wax); margin-left: .14em; vertical-align: baseline; }
 
 /* ---------- intro animation (once per session) ---------- */
 #intro { position: fixed; inset: 0; z-index: 50; background: var(--paper); display: none;
-  place-items: center; background-image: radial-gradient(rgba(30,61,47,.05) 1px, transparent 1px); background-size: 22px 22px;
+  place-items: center;
   transition: transform .55s cubic-bezier(.7,0,.2,1); will-change: transform; }
 #intro.play { display: grid; }
 #intro.leaving { transform: translateY(-100%); }
 .intro-inner { position: relative; width: min(74vw, 400px); height: min(64vh, 400px); }
-.intro-desk { position: absolute; left: 8%; right: 8%; bottom: 56px; height: 1.5px; background: var(--rule);
+.intro-desk { position: absolute; left: 8%; right: 8%; bottom: 56px; height: 1.5px; background: var(--rule-strong);
   transform: scaleX(0); transform-origin: center; animation: deskdraw .5s var(--ease-out) .95s both; }
 @keyframes deskdraw { to { transform: scaleX(1); } }
 .intro-flight { position: absolute; left: 50%; top: 34%; width: min(60vw, 300px);
@@ -76,13 +75,13 @@ body::before {
   55% { opacity: 1; }
   78% { transform: translate(-50%, -46%) rotate(2.5deg); }
   100% { transform: translate(-50%, -46%) rotate(0deg); opacity: 1; } }
-.intro-magpie { width: 100%; border-radius: 4px; display: block;
-  filter: drop-shadow(0 14px 18px rgba(30,61,47,.22)); }
+.intro-magpie { width: 100%; display: block;
+  filter: drop-shadow(0 14px 18px rgba(23,19,12,.22)); }
 .intro-letter { position: absolute; left: 50%; bottom: 62px; width: min(46vw, 220px); height: min(30vw, 138px);
-  background: #FDFBF4; border: 1px solid var(--rule);
-  box-shadow: 0 2px 0 rgba(30,61,47,.08), 0 18px 30px -16px rgba(30,61,47,.4);
+  background: var(--card); border: 1px solid var(--rule-strong);
+  box-shadow: 0 2px 0 rgba(23,19,12,.08), 0 18px 30px -16px rgba(23,19,12,.4);
   animation: letterdrop .6s var(--ease-spring) .8s both; will-change: transform; }
-.intro-letter::before { content: ""; position: absolute; inset: 7px; border: 1px solid var(--rule-soft); }
+.intro-letter::before { content: ""; position: absolute; inset: 7px; border: 1px solid var(--rule); }
 @keyframes letterdrop {
   0% { transform: translate(-50%, -120px); opacity: 0; }
   60% { opacity: 1; }
@@ -97,251 +96,217 @@ body::before {
   animation: sealring .55s var(--ease-out) 1.42s both; }
 @keyframes sealring { 0% { opacity: .85; transform: scale(.8); } 100% { opacity: 0; transform: scale(2); } }
 .intro-skip { position: absolute; bottom: 26px; left: 50%; transform: translateX(-50%);
-  font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-faint); }
+  font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-35); }
 @media (prefers-reduced-motion: reduce) { #intro.play { display: none; } }
 
 /* ---------- load choreography ---------- */
-.rise { opacity: 0; transform: translateY(18px); }
-body.ready .rise { opacity: 1; transform: none; transition: opacity .8s var(--ease-out), transform .8s var(--ease-out); }
-body.ready .rise.d1 { transition-delay: .05s } body.ready .rise.d2 { transition-delay: .16s }
-body.ready .rise.d3 { transition-delay: .28s } body.ready .rise.d4 { transition-delay: .4s }
-body.ready .rise.d5 { transition-delay: .52s } body.ready .rise.d6 { transition-delay: .66s }
-.kicker-line { display: inline-block; width: 0; height: 1px; background: var(--wax); vertical-align: middle; margin-right: 10px; transition: width .7s var(--ease-out) .35s; }
+.rise { opacity: 0; transform: translateY(16px); }
+body.ready .rise { opacity: 1; transform: none; transition: opacity .7s var(--ease-out), transform .7s var(--ease-out); }
+body.ready .rise.d1 { transition-delay: .04s } body.ready .rise.d2 { transition-delay: .14s }
+body.ready .rise.d3 { transition-delay: .24s } body.ready .rise.d4 { transition-delay: .34s }
+body.ready .rise.d5 { transition-delay: .44s } body.ready .rise.d6 { transition-delay: .56s }
+.kicker-line { display: inline-block; width: 0; height: 1px; background: var(--wax); vertical-align: middle; margin-right: 10px; transition: width .7s var(--ease-out) .3s; }
 body.ready .kicker-line { width: 34px; }
 
 /* ---------- header ---------- */
 header {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 24px 0 22px; border-bottom: 1px solid var(--rule);
+  display: flex; align-items: center; justify-content: space-between; gap: 20px;
+  padding: 18px 0 16px; border-bottom: 1px solid var(--rule-strong);
 }
 .brand { display: flex; align-items: center; gap: 12px; }
-.brand img { width: 42px; height: 42px; transition: transform .4s var(--ease-spring); }
+.brand img { width: 40px; height: 40px; transition: transform .4s var(--ease-spring); }
 .brand:hover img { transform: rotate(-6deg) scale(1.06); }
-.brand .word { font-family: 'Fraunces', serif; font-weight: 600; font-size: 27px; letter-spacing: .5px; }
-nav a {
-  color: var(--ink); text-decoration: none; margin-left: 28px;
-  font-family: 'IBM Plex Mono', monospace; font-size: 13px;
-  background-image: linear-gradient(var(--wax), var(--wax));
-  background-size: 0% 2px; background-repeat: no-repeat; background-position: 0 100%;
-  transition: background-size .35s var(--ease-out), color .25s;
-  padding-bottom: 3px;
-}
-nav a:hover { background-size: 100% 2px; }
-@media (max-width: 720px) { nav a { margin-left: 18px; font-size: 12.5px; } nav a:nth-child(1), nav a:nth-child(2), nav a:nth-child(3) { display: none; } header { padding: 18px 0 16px; } }
+.brand .word { font-family: 'Oswald', sans-serif; font-weight: 600; font-size: 24px; letter-spacing: .14em; text-transform: uppercase; }
+header nav { display: flex; gap: 30px; font-size: 11.5px; letter-spacing: .16em; text-transform: uppercase; }
+header nav a { text-decoration: none; color: var(--ink-70); position: relative; padding: 4px 0; }
+header nav a::after { content: ""; position: absolute; left: 0; bottom: 0; height: 1px; width: 100%; background: var(--wax);
+  transform: scaleX(0); transform-origin: left; transition: transform .3s var(--ease-out); }
+header nav a:hover { color: var(--ink); }
+header nav a:hover::after { transform: scaleX(1); }
+.head-cta { font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: .12em; text-transform: uppercase;
+  text-decoration: none; background: var(--wax); color: var(--paper); padding: 9px 16px; transition: background .25s, color .25s; }
+.head-cta:hover { background: var(--ink); color: var(--paper); }
+@media (max-width: 860px) { header nav { display: none; } }
 
 /* ---------- hero ---------- */
-.hero { display: grid; grid-template-columns: 1.12fr .88fr; gap: 56px; align-items: center; padding: 96px 0 72px; }
-@media (max-width: 820px) { .hero { grid-template-columns: 1fr; gap: 40px; padding: 48px 0 40px; } }
-@media (max-width: 640px) {
-  .kicker { font-size: 11px; letter-spacing: .12em; }
-  .lede { font-size: 17px; }
-  .cta .btn { width: 100%; text-align: center; }
-  .margin-note { font-size: 12px; }
-}
-.kicker { font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; letter-spacing: .16em; text-transform: uppercase; color: var(--ink-soft); }
+.hero { display: grid; grid-template-columns: 7fr 5fr; gap: 64px; align-items: center; padding: 84px 0 64px; }
+@media (max-width: 860px) { .hero { grid-template-columns: 1fr; gap: 44px; padding: 52px 0 44px; } }
+.kicker { font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: .18em; text-transform: uppercase; color: var(--ink-70); }
 h1 {
-  font-family: 'Fraunces', serif; font-weight: 560; font-variation-settings: "opsz" 100;
-  font-size: clamp(46px, 6.4vw, 80px); line-height: 1.03; letter-spacing: -0.018em;
-  margin: 26px 0 26px;
+  font-family: 'Oswald', sans-serif; font-weight: 500; text-transform: uppercase;
+  font-size: clamp(52px, 8vw, 106px); line-height: .98; letter-spacing: -0.005em;
+  margin: 22px 0 26px;
 }
-h1 em { font-style: italic; font-weight: 480; color: var(--ink-soft); }
-h1 .wm { display: inline-block; overflow: hidden; vertical-align: bottom; padding-bottom: .1em; margin-bottom: -.1em; }
-h1 .w { display: inline-block; transform: translateY(118%) rotate(3.5deg); will-change: transform; }
-body.ready h1 .w { transform: none; transition: transform .75s var(--ease-spring); }
-.lede { font-size: 19px; max-width: 30em; color: var(--ink-soft); line-height: 1.65; }
-.cta { display: flex; gap: 16px; margin-top: 40px; flex-wrap: wrap; }
-.btn {
-  position: relative; overflow: hidden; isolation: isolate;
-  font-family: 'IBM Plex Mono', monospace; font-size: 14px; text-decoration: none;
-  padding: 15px 28px; border-radius: 999px; border: 1.5px solid var(--ink);
-  color: var(--ink); transition: color .3s var(--ease-out), border-color .3s, transform .3s var(--ease-out);
-}
-.btn::before {
-  content: ""; position: absolute; inset: 0; z-index: -1;
-  background: var(--ink); transform: translateY(101%); transition: transform .35s var(--ease-out);
-}
-.btn:hover::before { transform: translateY(0); }
+h1 em { font-family: 'Newsreader', serif; font-style: italic; font-weight: 400; text-transform: none; letter-spacing: -0.02em; color: var(--wax); }
+h1 .wm { display: inline-block; overflow: hidden; vertical-align: bottom; padding-bottom: .09em; margin-bottom: -.09em; }
+h1 .w { display: inline-block; transform: translateY(115%); transition: transform .85s var(--ease-out); will-change: transform; }
+body.ready h1 .w { transform: none; }
+.lede { font-size: 20px; line-height: 1.55; color: var(--ink-70); max-width: 34em; }
+.cta { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 34px; }
+.btn { font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; letter-spacing: .1em; text-transform: uppercase;
+  text-decoration: none; padding: 15px 24px; border: 1px solid var(--ink); display: inline-block;
+  transition: background .25s, color .25s, border-color .25s; will-change: transform; }
 .btn.primary { background: var(--ink); color: var(--paper); }
-.btn.primary::before { background: var(--wax); }
-.btn.primary:hover { color: var(--ink); border-color: var(--wax); }
-.btn.ghost:hover { color: var(--paper); }
-.btn:hover { transform: translateY(-2px); }
-.btn:active { transform: translateY(0) scale(.98); }
-.margin-note {
-  font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; color: var(--ink-soft);
-  border-left: 2px solid var(--wax); padding-left: 12px; margin-top: 22px; max-width: 30em;
-  line-height: 1.7;
-}
-.hero figure { position: relative; }
-.hero figure img {
-  width: 100%; border-radius: 4px; display: block;
-  box-shadow: 0 1px 0 rgba(30,61,47,.15), 14px 18px 0 -6px var(--paper-2), 14px 18px 0 -5px var(--rule);
-  transform: rotate(1.2deg);
-  transition: transform .5s var(--ease-out);
-}
-.tape {
-  position: absolute; top: -13px; left: 50%; transform: translateX(-50%) rotate(-3.5deg);
-  width: 118px; height: 28px; background: rgba(232,163,61,.8); border-radius: 1px;
-  box-shadow: 0 1px 2px rgba(30,61,47,.15);
-}
-.tape::after { content: ""; position: absolute; inset: 4px 6px; border: 1px dashed rgba(246,241,229,.7); }
+.btn.primary:hover { background: var(--wax); border-color: var(--wax); color: var(--paper); }
+.btn.ghost { color: var(--ink); }
+.btn.ghost:hover { background: var(--ink); color: var(--paper); }
+.micro { font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-35); margin-top: 26px; }
+.hero figure { position: relative; border: 1px solid var(--rule-strong); background: var(--card); padding: 10px; will-change: transform; }
+.hero figure img { display: block; width: 100%; }
+.hero figure .seal { position: absolute; top: -26px; right: -22px; width: 76px; transform: rotate(9deg);
+  filter: drop-shadow(0 4px 6px rgba(23,19,12,.25)); }
+.hero figcaption { display: flex; justify-content: space-between; gap: 12px;
+  font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase;
+  color: var(--ink-55); padding-top: 12px; }
+
+/* ---------- ticker ---------- */
+.ticker { border-top: 1px solid var(--rule-strong); border-bottom: 1px solid var(--rule-strong); overflow: hidden; padding: 13px 0; }
+.ticker-track { display: flex; width: max-content; animation: tick 38s linear infinite; }
+.tick-group { display: flex; align-items: center; flex-shrink: 0; }
+.tick-item { font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: .18em; text-transform: uppercase; color: var(--ink-70); white-space: nowrap; }
+.tick-sq { width: 7px; height: 7px; background: var(--wax); margin: 0 26px; flex-shrink: 0; }
+@keyframes tick { to { transform: translateX(-50%); } }
+@media (prefers-reduced-motion: reduce) { .ticker-track { animation: none; } }
 
 /* ---------- sections ---------- */
-section { padding: 96px 0; border-top: 1px solid var(--rule); position: relative; }
-.sec-no {
-  position: absolute; top: 96px; right: 0; text-align: right;
-  font-family: 'Fraunces', serif; font-style: italic; font-size: 15px; color: var(--ink-faint);
-}
-@media (max-width: 820px) { .sec-no { display: none; } section { padding: 64px 0; } }
-.sec-label { font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; letter-spacing: .16em; text-transform: uppercase; color: var(--ink-soft); margin-bottom: 16px; }
-.sec-label::before { content: ""; display: inline-block; width: 26px; height: 1px; background: var(--wax); vertical-align: middle; margin-right: 9px; }
-h2 { font-family: 'Fraunces', serif; font-weight: 560; font-variation-settings: "opsz" 60; font-size: clamp(32px, 3.8vw, 46px); line-height: 1.1; letter-spacing: -0.012em; max-width: 19em; }
-.sec-lede { font-size: 18px; color: var(--ink-soft); max-width: 34em; margin-top: 16px; line-height: 1.65; }
+section { padding: 92px 0 8px; }
+.mast { display: flex; justify-content: space-between; align-items: baseline; gap: 16px;
+  border-top: 1px solid var(--rule-strong); padding-top: 14px;
+  font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: .18em; text-transform: uppercase; color: var(--ink-55); }
+.mast .r { color: var(--ink-35); }
+h2 { font-family: 'Oswald', sans-serif; font-weight: 500; text-transform: uppercase;
+  font-size: clamp(32px, 4.4vw, 54px); line-height: 1.04; letter-spacing: -0.005em; margin: 30px 0 18px; }
+h2 .lr { display: block; overflow: hidden; }
+h2 .lr > * , h2 .lr { transform-origin: left bottom; }
+section h2 .lr { animation: none; }
+h2 em { font-family: 'Newsreader', serif; font-style: italic; font-weight: 400; text-transform: none; color: var(--wax); }
+.sec-lede { font-size: 19px; color: var(--ink-70); max-width: 36em; }
 
-/* ---------- clippings (the collector) ---------- */
-.cols { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; margin-top: 56px; }
-@media (max-width: 820px) { .cols { grid-template-columns: 1fr; max-width: 460px; } }
-.clipping {
-  position: relative; background: #FBF8EF; padding: 30px 26px 28px;
-  box-shadow: 0 2px 0 rgba(30,61,47,.08), 0 14px 28px -18px rgba(30,61,47,.35);
-  border: 1px solid var(--rule-soft);
-  transition: transform .45s var(--ease-out), box-shadow .45s var(--ease-out);
-}
-.clipping:nth-child(1) { transform: rotate(-1.1deg); }
-.clipping:nth-child(2) { transform: rotate(.7deg) translateY(10px); }
-.clipping:nth-child(3) { transform: rotate(-.5deg); }
-.clipping:hover { transform: rotate(0) translateY(-6px); box-shadow: 0 2px 0 rgba(30,61,47,.08), 0 24px 40px -20px rgba(30,61,47,.45); }
-.clipping::before { /* tape corner */
-  content: ""; position: absolute; top: -11px; left: 22px; width: 62px; height: 22px;
-  background: rgba(232,163,61,.65); transform: rotate(-4deg); border-radius: 1px;
-}
-.clipping .n { font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; color: var(--wax); letter-spacing: .14em; }
-.clipping h3 { font-family: 'Fraunces', serif; font-weight: 600; font-size: 22px; margin: 12px 0 10px; }
-.clipping p { font-size: 15.5px; color: var(--ink-soft); line-height: 1.6; }
-.clipping svg { position: absolute; top: 24px; right: 22px; width: 34px; height: 34px; stroke: var(--ink-soft); fill: none; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; opacity: .85; transition: transform .4s var(--ease-spring); }
-.clipping:hover svg { transform: rotate(-8deg) scale(1.12); stroke: var(--wax); }
+/* line reveal for h2 lines */
+h2 .lr { position: relative; }
+h2 .lr { clip-path: inset(0 0 0 0); }
 
-/* ---------- scroll-driven diagram ---------- */
-.diagram { margin-top: 64px; position: relative; }
-.diagram svg { width: 100%; height: auto; display: block; overflow: visible; }
-.diagram .rail { stroke: var(--rule); stroke-width: 1.5; fill: none; stroke-dasharray: 3 7; }
-.diagram .ink-line { stroke: var(--ink); stroke-width: 2; fill: none; }
-.diagram .node { transition: opacity .4s; }
-.diagram .node .ring { fill: var(--paper); stroke: var(--rule); stroke-width: 1.5; transition: stroke .4s; }
-.diagram .node.lit .ring { stroke: var(--wax); }
-.diagram .node text { font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; fill: var(--ink-soft); }
-.diagram .node.lit text { fill: var(--ink); }
-.diagram .node .ic { stroke: var(--ink-soft); stroke-width: 1.7; fill: none; stroke-linecap: round; stroke-linejoin: round; transition: stroke .4s; }
-.diagram .node.lit .ic { stroke: var(--ink); }
-.diagram .caption-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 20px; }
-.diagram .caption { font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; color: var(--ink-soft); text-align: center; line-height: 1.7; opacity: .45; transition: opacity .4s; }
-.diagram .caption.lit { opacity: 1; }
-@media (max-width: 640px) {
-  .diagram svg { display: none; }
-  .diagram .caption-row { grid-template-columns: 1fr; gap: 0; margin-top: 8px; }
-  .diagram .caption { font-size: 12.5px; text-align: left; padding: 16px 0 16px 20px; border-left: 2px solid var(--rule); opacity: 1; position: relative; }
-  .diagram .caption::before { content: ""; position: absolute; left: -6px; top: 22px; width: 10px; height: 10px; border-radius: 50%; background: var(--paper); border: 1.5px solid var(--wax); }
-  .diagram .caption b { color: var(--ink); font-weight: 500; }
-}
+/* numbered rows */
+.rows { margin-top: 52px; border-top: 1px solid var(--rule); }
+.row2 { display: grid; grid-template-columns: 100px 1fr 1.1fr; gap: 28px; align-items: baseline;
+  padding: 26px 8px; border-bottom: 1px solid var(--rule); transition: background .3s; }
+.row2:hover { background: rgba(23,19,12,.035); }
+.row2 .idx { font-family: 'Oswald', sans-serif; font-weight: 500; font-size: 40px; color: var(--ink-35); transition: color .3s; }
+.row2:hover .idx { color: var(--wax); }
+.row2 h3 { font-family: 'Oswald', sans-serif; font-weight: 500; font-size: 26px; text-transform: uppercase; letter-spacing: .01em; }
+.row2 .body p { font-size: 16.5px; color: var(--ink-70); }
+.row2 .body .meta { font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; letter-spacing: .16em; text-transform: uppercase; color: var(--ink-35); margin-top: 10px; }
+@media (max-width: 860px) { .row2 { grid-template-columns: 56px 1fr; } .row2 .body { grid-column: 2; } .row2 .idx { font-size: 28px; } }
 
-/* ---------- the letter ---------- */
-.letter-wrap { display: grid; grid-template-columns: 1fr .7fr; gap: 56px; margin-top: 56px; align-items: start; }
-@media (max-width: 820px) { .letter-wrap { grid-template-columns: 1fr; gap: 40px; } }
-.letter {
-  position: relative; background: #FDFBF4; border: 1px solid var(--rule-soft);
-  padding: 44px 40px 36px; max-width: 560px;
-  box-shadow: 0 2px 0 rgba(30,61,47,.08), 0 20px 34px -20px rgba(30,61,47,.35);
-  transform: rotate(-.6deg);
+/* ---------- the morning letter ---------- */
+.letter-wrap { display: grid; grid-template-columns: 5fr 7fr; gap: 56px; margin-top: 52px; align-items: start; }
+@media (max-width: 860px) { .letter-wrap { grid-template-columns: 1fr; gap: 40px; } }
+.rule-note { border-top: 1px solid var(--rule-strong); padding: 16px 0 20px; }
+.rule-note b { display: block; font-family: 'IBM Plex Mono', monospace; font-weight: 500; font-size: 11px; letter-spacing: .16em; text-transform: uppercase; margin-bottom: 8px; }
+.rule-note b::before { content: ""; display: inline-block; width: 7px; height: 7px; background: var(--wax); margin-right: 10px; }
+.rule-note p { font-size: 16.5px; color: var(--ink-70); }
+.letter { position: relative; background: var(--card); border: 1px solid var(--rule-strong);
+  box-shadow: 10px 10px 0 rgba(23,19,12,.06); padding: 30px 34px 26px; }
+.letter .lh { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap;
+  border-bottom: 3px double var(--rule-strong); padding-bottom: 12px; }
+.letter .lh .t { font-family: 'Oswald', sans-serif; font-weight: 600; font-size: 19px; letter-spacing: .06em; text-transform: uppercase; }
+.letter .lh .d { font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-55); }
+.letter .salut { font-style: italic; font-size: 18px; color: var(--ink-70); padding: 16px 0 6px; }
+.letter .sec-h { display: flex; align-items: center; gap: 14px;
+  font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; letter-spacing: .18em; text-transform: uppercase; color: var(--ink-55);
+  margin: 22px 0 12px; }
+.letter .sec-h::after { content: ""; flex: 1; height: 1px; background: var(--rule); }
+.letter .item { padding: 12px 0; border-bottom: 1px solid var(--rule); }
+.letter .item:last-of-type { border-bottom: 0; }
+.letter .item b { display: block; font-weight: 500; font-size: 17px; }
+.letter .item small { display: block; font-size: 15px; color: var(--ink-70); margin-top: 2px; }
+.letter .item .u { display: block; font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-35); margin-top: 6px; }
+.letter .job { display: grid; grid-template-columns: 1fr auto; gap: 4px 16px; padding: 13px 0; border-bottom: 1px solid var(--rule); align-items: baseline; }
+.letter .job .role { font-weight: 500; font-size: 16.5px; }
+.letter .job .co { font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-55); }
+.letter .job .pay { font-family: 'IBM Plex Mono', monospace; font-size: 12px; text-align: right; }
+.letter .job .by { font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-35); text-align: right; }
+.letter .job .new { display: inline-block; background: var(--wax); color: var(--paper);
+  font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; letter-spacing: .14em; text-transform: uppercase;
+  padding: 3px 7px; margin-left: 8px; vertical-align: 2px; }
+.letter .job .co { margin-left: 6px; }
+@media (max-width: 720px) {
+  .letter { padding: 22px 20px 20px; box-shadow: 5px 5px 0 rgba(23,19,12,.06); }
+  .letter .job { grid-template-columns: 1fr; gap: 3px; }
+  .letter .job .co { display: block; margin: 4px 0 0; }
+  .letter .job .pay, .letter .job .by { text-align: left; }
+  .letter .job .new { margin-left: 0; margin-top: 6px; }
+  .letter .sign { padding-right: 76px; }
+  .mast { flex-wrap: wrap; gap: 4px 16px; }
 }
-.letter::before { content: ""; position: absolute; inset: 10px; border: 1px solid var(--rule-soft); pointer-events: none; }
-.letter .lh { display: flex; justify-content: space-between; align-items: baseline; border-bottom: 1px solid var(--rule); padding-bottom: 12px; gap: 14px; flex-wrap: wrap; }
-@media (max-width: 640px) { .letter { padding: 30px 22px 28px; } .letter .lh .d { width: 100%; } }
-.letter .lh .t { font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: .16em; text-transform: uppercase; color: var(--ink-soft); }
-.letter .lh .d { font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; color: var(--ink-faint); }
-.letter .salut { font-family: 'Fraunces', serif; font-style: italic; font-size: 20px; margin: 22px 0 4px; }
-.letter .sec-h { font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: .14em; text-transform: uppercase; color: var(--wax); margin-top: 24px; }
-.letter .item { margin-top: 12px; font-size: 15px; line-height: 1.55; }
-.letter .item b { font-weight: 600; }
-.letter .item small { display: block; color: var(--ink-soft); }
-.letter .item .u { font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; color: var(--ink-faint); }
-.letter .sign { font-family: 'Fraunces', serif; font-style: italic; font-size: 16px; color: var(--ink-soft); margin-top: 28px; }
-.letter .seal { position: absolute; bottom: -30px; right: -26px; width: 86px; transform: rotate(8deg) scale(1.7); opacity: 0; }
-.letter.in .seal { animation: stamp .55s var(--ease-spring) .25s forwards; }
-@keyframes stamp {
-  0% { opacity: 0; transform: rotate(8deg) scale(1.7); }
-  60% { opacity: 1; transform: rotate(6deg) scale(.94); }
-  80% { transform: rotate(9deg) scale(1.04); }
-  100% { opacity: 1; transform: rotate(8deg) scale(1); }
-}
-.letter .seal:hover { animation: sealpress .5s var(--ease-spring) forwards; }
-@keyframes sealpress { 50% { transform: rotate(8deg) scale(.9); } 100% { transform: rotate(8deg) scale(1); } }
-.letter .item, .letter .salut, .letter .sign { opacity: 0; transform: translateY(8px); transition: opacity .5s var(--ease-out), transform .5s var(--ease-out); }
-.letter.in .salut, .letter.in .item, .letter.in .sign { opacity: 1; transform: none; }
-.letter.in .salut { transition-delay: .15s; }
-.letter.in .item { transition-delay: .35s; }
-.letter.in .item ~ .item { transition-delay: .5s; }
-.letter.in .sec-h ~ .item { transition-delay: .6s; }
-.letter.in .sign { transition-delay: .8s; }
-.letter-side .rule-note { border-top: 1px solid var(--rule); padding-top: 14px; margin-top: 22px; font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; color: var(--ink-soft); line-height: 1.75; }
-.letter-side .rule-note b { color: var(--ink); font-weight: 500; }
+.letter .sign { font-style: italic; font-size: 17px; color: var(--ink-70); margin-top: 18px; padding-right: 90px; }
+.letter .seal { position: absolute; right: 22px; bottom: 18px; width: 82px; transform: rotate(8deg);
+  mix-blend-mode: multiply; filter: drop-shadow(0 3px 4px rgba(23,19,12,.2)); }
+/* letter reveal choreography */
+.letter .item, .letter .job, .letter .salut, .letter .sign { opacity: 0; transform: translateY(12px); }
+.letter.in .item, .letter.in .job, .letter.in .salut, .letter.in .sign {
+  opacity: 1; transform: none; transition: opacity .6s var(--ease-out), transform .6s var(--ease-out); }
+.letter.in .salut { transition-delay: .1s }
+.letter.in .item:nth-of-type(1) { transition-delay: .18s } .letter.in .item:nth-of-type(2) { transition-delay: .26s }
+.letter.in .job:nth-of-type(1) { transition-delay: .34s } .letter.in .job:nth-of-type(2) { transition-delay: .42s }
+.letter.in .sign { transition-delay: .5s }
+.letter .seal { opacity: 0; transform: scale(2) rotate(18deg); }
+.letter.in .seal { opacity: 1; transform: scale(1) rotate(8deg); transition: opacity .45s var(--ease-spring) .55s, transform .45s var(--ease-spring) .55s; }
 
-/* ---------- spec sheet ---------- */
-.spec { margin-top: 56px; border-top: 1px solid var(--rule); }
-.spec .row {
-  display: grid; grid-template-columns: 220px 1fr auto; gap: 24px; align-items: baseline;
-  padding: 20px 4px; border-bottom: 1px solid var(--rule-soft);
-  transition: background .3s, padding-left .3s var(--ease-out);
-}
-.spec .row:hover { background: rgba(255,255,255,.5); padding-left: 14px; }
-.spec .k { font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: var(--ink-soft); letter-spacing: .04em; }
-.spec .v { font-size: 16.5px; }
-.spec .v b { font-family: 'Fraunces', serif; font-weight: 600; font-size: 18px; }
-.spec .c { font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: var(--ink-faint); }
-@media (max-width: 720px) { .spec .row { grid-template-columns: 1fr; gap: 4px; } }
+/* ---------- spec table ---------- */
+.spec { margin-top: 52px; border-top: 1px solid var(--rule); }
+.spec .row { display: grid; grid-template-columns: 200px 1fr auto; gap: 24px; align-items: baseline;
+  padding: 20px 8px; border-bottom: 1px solid var(--rule); transition: background .3s; }
+.spec .row:hover { background: rgba(23,19,12,.035); }
+.spec .k { font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: .18em; text-transform: uppercase; color: var(--ink-55); }
+.spec .v { font-size: 17.5px; color: var(--ink-70); }
+.spec .v b { font-family: 'Oswald', sans-serif; font-weight: 500; font-size: 19px; text-transform: uppercase; color: var(--ink); letter-spacing: .01em; }
+.spec .c { font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-35); }
+@media (max-width: 720px) { .spec .row { grid-template-columns: 1fr; gap: 6px; } }
+.margin-note { font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-35); margin-top: 22px; }
 
 /* ---------- self-host ---------- */
-.steps { margin-top: 52px; counter-reset: step; }
-.step2 { display: grid; grid-template-columns: 64px 1fr; gap: 20px; padding: 18px 0; border-bottom: 1px dashed var(--rule); }
-.step2 .num {
-  font-family: 'Fraunces', serif; font-style: italic; font-size: 30px; color: var(--wax);
-  width: 56px; height: 56px; border: 1.5px solid var(--rule); border-radius: 50%;
-  display: grid; place-items: center;
-}
-.step2 p { font-size: 16.5px; padding-top: 6px; }
-.step2 code { font-family: 'IBM Plex Mono', monospace; font-size: 14px; background: rgba(30,61,47,.07); padding: 2px 8px; border-radius: 4px; }
+.self-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 56px; margin-top: 40px; align-items: start; }
+@media (max-width: 860px) { .self-grid { grid-template-columns: 1fr; gap: 36px; } }
+.self-grid p.copy { font-size: 18px; color: var(--ink-70); max-width: 30em; }
+.code { background: var(--ink); color: var(--paper); padding: 24px 26px;
+  font-family: 'IBM Plex Mono', monospace; font-size: 13.5px; line-height: 2; overflow-x: auto; }
+.code .p { color: var(--wax); }
+.code .c { color: rgba(248,245,238,.45); }
+.code-cap { font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; letter-spacing: .16em; text-transform: uppercase; color: var(--ink-35); margin-top: 12px; }
 
-footer { border-top: 1px solid var(--rule); padding: 44px 0 60px; }
-.foot-grid { display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 18px; }
-footer .quip { font-family: 'Fraunces', serif; font-style: italic; font-size: 19px; color: var(--ink-soft); max-width: 22em; }
-footer .colophon { font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: var(--ink-faint); line-height: 1.9; text-align: right; }
-footer .colophon a { color: var(--ink-soft); text-decoration: none; border-bottom: 1px solid var(--rule); transition: color .25s, border-color .25s; }
-footer .colophon a:hover { color: var(--wax); border-color: var(--wax); }
+/* ---------- closing band + footer ---------- */
+.band { margin-top: 110px; background: var(--ink); color: var(--paper); }
+.band-inner { max-width: 1180px; margin: 0 auto; padding: 96px 28px 0; text-align: center; }
+.band h2 { color: var(--paper); margin: 0 0 30px; font-size: clamp(44px, 7vw, 96px); }
+.band .sq { width: .22em; height: .22em; }
+.band .btn.light { background: var(--paper); color: var(--ink); border-color: var(--paper); }
+.band .btn.light:hover { background: var(--wax); border-color: var(--wax); color: var(--paper); }
+.band .btn.ghostd { background: transparent; color: var(--paper); border-color: rgba(248,245,238,.4); }
+.band .btn.ghostd:hover { border-color: var(--paper); }
+.band .quip { font-style: italic; font-size: 17px; color: rgba(248,245,238,.55); margin-top: 44px; }
+.band footer { margin-top: 72px; border-top: 1px solid rgba(248,245,238,.22); padding: 24px 0 26px;
+  display: flex; justify-content: space-between; gap: 14px; flex-wrap: wrap; text-align: left;
+  font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase; color: rgba(248,245,238,.5); }
+.band footer a { color: rgba(248,245,238,.75); text-decoration: none; }
+.band footer a:hover { color: var(--paper); }
+@media (max-width: 720px) { .band footer { flex-direction: column; gap: 8px; } }
 
-.reveal { opacity: 0; transform: translateY(28px); transition: opacity .75s var(--ease-out), transform .75s var(--ease-out); }
-.reveal.in { opacity: 1; transform: none; }
-.cols .clipping.reveal:nth-child(2) { transition-delay: .12s; }
-.cols .clipping.reveal:nth-child(3) { transition-delay: .24s; }
-.spec .row.reveal:nth-child(2) { transition-delay: .1s; }
-.spec .row.reveal:nth-child(3) { transition-delay: .2s; }
-.spec .row.reveal:nth-child(4) { transition-delay: .3s; }
-.steps .step2.reveal:nth-child(2) { transition-delay: .12s; }
-.steps .step2.reveal:nth-child(3) { transition-delay: .24s; }
-h2 .lr { display: block; clip-path: inset(0 100% 0 0); transition: clip-path .9s var(--ease-out); }
-h2.in .lr { clip-path: inset(0 -2% 0 0); }
-h2 .lr + .lr { transition-delay: .14s; }
-@media (pointer: fine) {
-  .btn { will-change: transform; }
-  .btn.magnet { transition: transform .45s var(--ease-spring), color .3s var(--ease-out), border-color .3s; }
-}
-.hero figure { will-change: transform; }
-.clipping.reveal:nth-child(1).in { transform: rotate(-1.1deg); }
-.clipping.reveal:nth-child(2).in { transform: rotate(.7deg) translateY(10px); }
-.clipping.reveal:nth-child(3).in { transform: rotate(-.5deg); }
-.clipping.reveal.in:hover { transform: rotate(0) translateY(-6px); }
+/* ---------- reveals ---------- */
+.reveal { opacity: 0; transform: translateY(22px); }
+.reveal.in { opacity: 1; transform: none; transition: opacity .75s var(--ease-out), transform .75s var(--ease-out); }
+.rows .row2.reveal.in:nth-child(1) { transition-delay: .05s } .rows .row2.reveal.in:nth-child(2) { transition-delay: .15s }
+.rows .row2.reveal.in:nth-child(3) { transition-delay: .25s }
+.spec .row.reveal.in:nth-child(1) { transition-delay: .05s } .spec .row.reveal.in:nth-child(2) { transition-delay: .13s }
+.spec .row.reveal.in:nth-child(3) { transition-delay: .21s } .spec .row.reveal.in:nth-child(4) { transition-delay: .29s }
+h2 .lr { transition: none; }
+section h2 .lr { opacity: 0; transform: translateY(60%); display: block; }
+section h2.in .lr { opacity: 1; transform: none; transition: opacity .8s var(--ease-out), transform .8s var(--ease-out); }
+section h2.in .lr:nth-child(2) { transition-delay: .12s }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
-  .rise, h1 .w, .reveal, .letter .item, .letter .salut, .letter .sign, .letter .seal { opacity: 1 !important; transform: none !important; }
+  .rise, h1 .w, .reveal, .letter .item, .letter .job, .letter .salut, .letter .sign, .letter .seal, section h2 .lr { opacity: 1 !important; transform: none !important; }
   .kicker-line { width: 34px !important; }
 }
 </style>
@@ -363,147 +328,159 @@ h2 .lr + .lr { transition-delay: .14s; }
     <span class="word">Nook</span>
   </div>
   <nav class="mono rise d1">
-    <a href="#how">The collector</a>
-    <a href="#digest">The morning letter</a>
+    <a href="#how">How it works</a>
+    <a href="#letter">The letter</a>
+    <a href="#stack">The stack</a>
     <a href="#selfhost">Self-host</a>
-    <a href="https://github.com/Prajit-22/nook">GitHub</a>
   </nav>
+  <a class="head-cta rise d1" href="/app">Open app</a>
 </header>
 
 <div class="hero">
   <div>
-    <div class="kicker rise d2"><span class="kicker-line"></span>A Telegram bot, kept by a magpie</div>
-    <h1 aria-label="Toss links in all day. Wake up to one sealed letter.">Toss links in all day. <em>Wake up to one sealed letter.</em></h1>
-    <p class="lede rise d4">Nook is a small bot with a magpie's habits. Every link you toss at it gets fetched, read, summarized and filed. At 08:00 sharp it delivers one letter: what you saved, what it says, and which fresh paid openings are worth your morning.</p>
+    <div class="kicker rise d2"><span class="kicker-line"></span>Read-it-later + job digest Â· a Telegram bot</div>
+    <h1 aria-label="Save everything. Read what matters.">Save everything.<br>Read what <em>matters</em><span class="sq" aria-hidden="true"></span></h1>
+    <p class="lede rise d4">Nook is a Telegram bot with a magpie's habits. Toss it a link any time; it fetches, summarizes and files each one. At 08:00 sharp you get one sealed letter: what you saved, what it says, and which paid openings are worth your morning.</p>
     <div class="cta rise d5">
       <a class="btn primary" href="https://t.me/Nook_digest_bot">Talk to @Nook_digest_bot</a>
-      <a class="btn ghost" href="https://github.com/Prajit-22/nook">Star on GitHub</a>
+      <a class="btn ghost" href="/app">Enter the web app</a>
     </div>
-    <p class="margin-note rise d6">runs entirely on Cloudflare's free tier<br>no server &middot; no Docker &middot; no bill</p>
+    <p class="micro rise d6">Cloudflare free tier Â· no server Â· no docker Â· no bill</p>
   </div>
   <figure class="rise d3">
-    <div class="tape"></div>
+    <img class="seal" src="__BRAND__/seal.png" alt="">
     <img id="magpie" src="__BRAND__/magpie.jpg" alt="Ink illustration of a magpie perched on a stack of sealed letters">
+    <figcaption><span>Fig. 01</span><span>Pica pica, keeper of links</span></figcaption>
   </figure>
 </div>
+</div>
 
-<section id="how">
-  <div class="sec-no">No. 1</div>
-  <div class="sec-label">The collector</div>
-  <h2>Magpies hoard shiny things.<br>Yours hoards links.</h2>
-  <div class="cols">
-    <div class="clipping reveal">
-      <svg viewBox="0 0 34 34"><path d="M21 9 L10 20 a4.2 4.2 0 0 0 6 6 L27 15 a6.8 6.8 0 0 0 -9.6 -9.6 L7 16"/></svg>
-      <div class="n">FIG. 01</div>
-      <h3>Send anything</h3>
-      <p>A link, or a thought with /note. The page is fetched at the edge, the text pulled out, and an LLM writes a two-sentence summary with tags before it hits the shelf.</p>
+<div class="ticker" aria-hidden="true">
+  <div class="ticker-track">
+    <div class="tick-group">
+      <span class="tick-item">Toss it a link</span><span class="tick-sq"></span>
+      <span class="tick-item">Fetched at the edge</span><span class="tick-sq"></span>
+      <span class="tick-item">Summarized + tagged</span><span class="tick-sq"></span>
+      <span class="tick-item">One letter at 08:00</span><span class="tick-sq"></span>
+      <span class="tick-item">Paid openings only</span><span class="tick-sq"></span>
+      <span class="tick-item">Never the same opening twice</span><span class="tick-sq"></span>
     </div>
-    <div class="clipping reveal">
-      <svg viewBox="0 0 34 34"><circle cx="15" cy="15" r="8"/><path d="M21 21 L28 28"/><path d="M12 15 a3 3 0 0 1 3 -3"/></svg>
-      <div class="n">FIG. 02</div>
-      <h3>Ask it back</h3>
-      <p>Plain questions search your whole nook with BM25 and answer with cited sources. Send the same link twice and it is recognized, not re-filed.</p>
-    </div>
-    <div class="clipping reveal">
-      <svg viewBox="0 0 34 34"><path d="M8 10 h18 M8 17 h18 M8 24 h11"/><path d="M22 22 l6 6 M28 22 l-6 6"/></svg>
-      <div class="n">FIG. 03</div>
-      <h3>Forget on command</h3>
-      <p>/list shows recent saves, /forget removes one. The database lives in your own Cloudflare account - your clippings never sit on anyone else's shelf.</p>
+    <div class="tick-group">
+      <span class="tick-item">Toss it a link</span><span class="tick-sq"></span>
+      <span class="tick-item">Fetched at the edge</span><span class="tick-sq"></span>
+      <span class="tick-item">Summarized + tagged</span><span class="tick-sq"></span>
+      <span class="tick-item">One letter at 08:00</span><span class="tick-sq"></span>
+      <span class="tick-item">Paid openings only</span><span class="tick-sq"></span>
+      <span class="tick-item">Never the same opening twice</span><span class="tick-sq"></span>
     </div>
   </div>
+</div>
 
-  <div class="diagram" id="diagram">
-    <svg viewBox="0 0 1000 170" aria-hidden="true">
-      <path class="rail" d="M120 85 H 880"/>
-      <path class="ink-line" id="inkpath" d="M120 85 H 880"/>
-      <g class="node" id="node1">
-        <circle class="ring" cx="120" cy="85" r="34"/>
-        <g class="ic" transform="translate(108 73)"><path d="M14 4 L6 12 a4 4 0 0 0 5.6 5.6 L20 9 a6.5 6.5 0 0 0 -9.2 -9.2 L4 6"/></g>
-        <text x="120" y="145" text-anchor="middle">you send a link</text>
-      </g>
-      <g class="node" id="node2">
-        <circle class="ring" cx="500" cy="85" r="34"/>
-        <g class="ic" transform="translate(488 73)"><path d="M3 12 q4 -8 9 -2 q5 -6 9 2"/><path d="M6 18 h12 M6 22 h8"/></g>
-        <text x="500" y="145" text-anchor="middle">fetched, summarized, tagged</text>
-      </g>
-      <g class="node" id="node3">
-        <circle class="ring" cx="880" cy="85" r="34"/>
-        <g class="ic" transform="translate(866 71)"><rect x="2" y="6" width="24" height="17" rx="1.5"/><path d="M2 8 L14 16 L26 8"/></g>
-        <text x="880" y="145" text-anchor="middle">one letter at 08:00</text>
-      </g>
-    </svg>
-    <div class="caption-row">
-      <div class="caption" id="cap1"><b>You send a link</b><br>webhook, secret-verified - dropped on the pile</div>
-      <div class="caption" id="cap2"><b>Fetched, summarized, tagged</b><br>Workers AI at the edge - two sentences + tags</div>
-      <div class="caption" id="cap3"><b>One letter at 08:00</b><br>D1 + FTS5 underneath - sealed, delivered once</div>
+<div class="page">
+
+<section id="how">
+  <div class="mast"><span>01 Â· How it works</span><span class="r">The collector</span></div>
+  <h2>Magpies hoard shiny things.<br>Yours hoards <em>links</em>.</h2>
+  <div class="rows">
+    <div class="row2 reveal">
+      <div class="idx">01</div>
+      <h3>Send anything</h3>
+      <div class="body">
+        <p>A link, or a thought with /note. The page is fetched at the edge, an LLM writes a two-sentence summary with tags, and it lands on your shelf.</p>
+        <div class="meta">Webhook Â· secret-verified</div>
+      </div>
+    </div>
+    <div class="row2 reveal">
+      <div class="idx">02</div>
+      <h3>Ask it back</h3>
+      <div class="body">
+        <p>Plain questions search your whole nook with BM25 and answer with cited sources. Send the same link twice and it is recognized, not re-filed.</p>
+        <div class="meta">D1 + FTS5 Â· sha256 dedup</div>
+      </div>
+    </div>
+    <div class="row2 reveal">
+      <div class="idx">03</div>
+      <h3>Forget on command</h3>
+      <div class="body">
+        <p>/list shows recent saves, /forget removes one. The database lives in your own Cloudflare account; your clippings never sit on anyone else's shelf.</p>
+        <div class="meta">Your account Â· your data</div>
+      </div>
     </div>
   </div>
 </section>
 
-<section id="digest">
-  <div class="sec-no">No. 2</div>
-  <div class="sec-label">The morning letter</div>
-  <h2>One sealed digest, 08:00 sharp.</h2>
-  <p class="sec-lede">Unread reads on top, then fresh openings pulled live from public job boards at send time. Paid roles only. Nothing is ever sent twice.</p>
+<section id="letter">
+  <div class="mast"><span>02 Â· The morning letter</span><span class="r">Sealed Â· delivered once</span></div>
+  <h2>One sealed digest,<br>08:00 <em>sharp</em>.</h2>
   <div class="letter-wrap">
-    <div class="letter" id="letter">
-      <img class="seal" src="__BRAND__/seal.png" alt="Amber wax seal stamped with an N">
-      <div class="lh"><span class="t">Nook - The Morning Letter</span><span class="d">no. 214 &middot; 08:00 IST</span></div>
-      <p class="salut">Good morning. Three things you saved, two worth applying to.</p>
-      <div class="sec-h">In your nook - 3 unread</div>
-      <div class="item"><b>#12 Vector indexes, explained simply</b><small>why HNSW wins at recall per ms, in pictures</small><span class="u">simonwillison.net</span></div>
-      <div class="item"><b>#14 The $0 LLM stack</b><small>free tiers, compared honestly</small><span class="u">github.com</span></div>
-      <div class="sec-h">Fresh openings - paid, checked at send time</div>
-      <div class="item"><b>Backend Engineer Intern @ Acme</b><small>$20k-$40k/yr &middot; remote</small><span class="u">remoteok.com</span></div>
-      <p class="sign">- your magpie</p>
+    <div>
+      <div class="rule-note reveal"><b>Reads first</b><p>Whatever you saved and never opened rides at the top, one line of summary each, source attached.</p></div>
+      <div class="rule-note reveal"><b>Then openings</b><p>Job boards are queried at send time, not cached overnight. If a listing is dead by morning, it never reaches you.</p></div>
+      <div class="rule-note reveal"><b>Exactly once</b><p>Every opening is hashed against your history. The letter never repeats itself.</p></div>
     </div>
-    <div class="letter-side">
-      <div class="rule-note reveal"><b>Reads first.</b> Whatever you saved and never opened rides at the top, one line of summary each, source attached.</div>
-      <div class="rule-note reveal"><b>Then openings.</b> RemoteOK and Remotive are queried at send time, not cached overnight - if a listing is dead by morning, it never reaches you.</div>
-      <div class="rule-note reveal"><b>Exactly once.</b> Every opening is hashed against your history. The letter never repeats itself.</div>
+    <div class="letter" id="letter">
+      <div class="lh"><span class="t">Nook Â· The Morning Letter</span><span class="d">No. 214 Â· Fri 24 Oct Â· 08:00 IST</span></div>
+      <p class="salut">Good morning. Three reads you filed, two openings worth your first coffee.</p>
+      <div class="sec-h">In your nook Â· 3 unread</div>
+      <div class="item"><b>Vector indexes, explained simply</b><small>Why HNSW wins at recall per millisecond, in pictures.</small><span class="u">simonwillison.net Â· 12 min Â· #vectors</span></div>
+      <div class="item"><b>The $0 LLM stack</b><small>Free tiers compared honestly: what breaks first and when.</small><span class="u">github.com Â· 8 min Â· #infra</span></div>
+      <div class="sec-h">Fresh openings Â· paid, checked at send</div>
+      <div class="job"><div><span class="role">Python Development Intern</span> <span class="co">Digitap.ai Â· Bengaluru</span><span class="new">New</span></div><div class="pay">â¹15-18k/mo</div><div class="by">Apply by 12 Nov</div></div>
+      <div class="job"><div><span class="role">Junior Backend Engineer</span> <span class="co">Northwind Â· Remote</span></div><div class="pay">â¹6-9 LPA</div><div class="by">Apply by 30 Oct</div></div>
+      <p class="sign">your magpie,</p>
+      <img class="seal" src="__BRAND__/seal.png" alt="A wax seal stamped with an N">
     </div>
   </div>
 </section>
 
 <section id="stack">
-  <div class="sec-no">No. 3</div>
-  <div class="sec-label">Under the feathers</div>
-  <h2>One Python Worker, four free services,<br>zero maintenance.</h2>
+  <div class="mast"><span>03 Â· Under the feathers</span><span class="r">One worker Â· four free services</span></div>
+  <h2>Zero servers,<br>zero <em>maintenance</em>.</h2>
   <div class="spec">
-    <div class="row reveal"><span class="k">TELEGRAM</span><span class="v"><b>Webhook in, letter out.</b> HMAC secret checked on every call; forged updates are dropped unread.</span><span class="c">@Nook_digest_bot</span></div>
-    <div class="row reveal"><span class="k">WORKERS AI</span><span class="v"><b>Summaries, tags, answers.</b> Llama 3.1 at the edge - no API key, no quota anxiety.</span><span class="c">free tier</span></div>
-    <div class="row reveal"><span class="k">D1 + FTS5</span><span class="v"><b>Your shelf.</b> SQLite with BM25 full-text search and sha256 dedup.</span><span class="c">your account</span></div>
-    <div class="row reveal"><span class="k">CRON</span><span class="v"><b>The 08:00 alarm.</b> One trigger, one letter, then silence for 24 hours.</span><span class="c">30 2 * * *</span></div>
+    <div class="row reveal"><span class="k">Telegram</span><span class="v"><b>Webhook in, letter out.</b> HMAC secret checked on every call; forged updates are dropped unread.</span><span class="c">@Nook_digest_bot</span></div>
+    <div class="row reveal"><span class="k">Workers AI</span><span class="v"><b>Summaries, tags, answers.</b> Llama 3.1 at the edge, no API key, no quota anxiety.</span><span class="c">Free tier</span></div>
+    <div class="row reveal"><span class="k">D1 + FTS5</span><span class="v"><b>Your shelf.</b> SQLite with BM25 full-text search and sha256 dedup.</span><span class="c">Your account</span></div>
+    <div class="row reveal"><span class="k">Cron</span><span class="v"><b>The 08:00 alarm.</b> One trigger, one letter, then silence for 24 hours.</span><span class="c">30 2 * * *</span></div>
   </div>
-  <p class="margin-note reveal">58 unit tests, CI on every push - the runtime file is the only untested seam</p>
+  <p class="margin-note reveal">67 unit tests Â· CI on every push</p>
 </section>
 
 <section id="selfhost">
-  <div class="sec-no">No. 4</div>
-  <div class="sec-label">Keep your own magpie</div>
-  <h2>Deploy your own in about five minutes.</h2>
-  <div class="steps">
-    <div class="step2 reveal"><div class="num">1</div><p>Ask BotFather for a token. One message, no forms.</p></div>
-    <div class="step2 reveal"><div class="num">2</div><p>Fork the repo, create one D1 database, set two secrets.</p></div>
-    <div class="step2 reveal"><div class="num">3</div><p><code>wrangler deploy</code> - the webhook registers itself. Keywords, digest hour and allow-list are yours to tune.</p></div>
-  </div>
-  <div class="cta">
-    <a class="btn primary" href="https://github.com/Prajit-22/nook">Deploy from GitHub</a>
-    <a class="btn ghost" href="https://deploy.workers.cloudflare.com/?url=https://github.com/Prajit-22/nook">Deploy to Cloudflare</a>
+  <div class="mast"><span>04 Â· Keep your own magpie</span><span class="r">MIT Â· self-hosted</span></div>
+  <h2>Deploy your own<br>in five <em>minutes</em>.</h2>
+  <div class="self-grid">
+    <div>
+      <p class="copy">Ask BotFather for a token, fork the repo, create one D1 database, set two secrets, deploy. Keywords, digest hour and allow-list are yours to tune. The webhook registers itself.</p>
+      <div class="cta">
+        <a class="btn primary" href="https://github.com/Prajit-22/nook">Fork on GitHub</a>
+        <a class="btn ghost" href="https://deploy.workers.cloudflare.com/?url=https://github.com/Prajit-22/nook">Deploy to Cloudflare</a>
+      </div>
+    </div>
+    <div class="reveal">
+      <div class="code"><span class="p">$</span> git clone github.com/Prajit-22/nook<br><span class="p">$</span> wrangler d1 create nook-db<br><span class="p">$</span> wrangler deploy<br><span class="c"># the webhook registers itself</span></div>
+      <div class="code-cap">Three commands Â· your account Â· your data</div>
+    </div>
   </div>
 </section>
 
-<footer>
-  <div class="foot-grid">
-    <div class="quip">No magpies were rushed in the making of your digest.</div>
-    <div class="colophon">
-      set in Fraunces &amp; IBM Plex Mono &middot; ink #1E3D2F on cream<br>
-      <a href="https://github.com/Prajit-22/nook">Prajit-22/nook</a> &middot; MIT &middot; <a href="https://t.me/Nook_digest_bot">@Nook_digest_bot</a>
-    </div>
-  </div>
-</footer>
-
 </div>
+
+<div class="band">
+  <div class="band-inner">
+    <h2>Stop skimming.<br>Start keeping<span class="sq" aria-hidden="true"></span></h2>
+    <div class="cta" style="justify-content:center">
+      <a class="btn light" href="https://t.me/Nook_digest_bot">Open @Nook_digest_bot</a>
+      <a class="btn ghostd" href="https://github.com/Prajit-22/nook">Star on GitHub</a>
+    </div>
+    <p class="quip">No magpies were rushed in the making of your digest.</p>
+    <footer>
+      <span>Nook Â· a magpie for your links</span>
+      <span>Set in Oswald, Newsreader + Plex Mono</span>
+      <span><a href="https://github.com/Prajit-22/nook">Prajit-22/nook</a> Â· MIT Â· Â© 2026</span>
+    </footer>
+  </div>
+</div>
+
 <script>
 (function () {
   var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -562,7 +539,6 @@ h2 .lr + .lr { transition-delay: .14s; }
     readyUp();
   }
   function playIntro() {
-    /* wait for the two images (or 700ms) so nothing plays blank */
     var imgs = Array.prototype.slice.call(intro.querySelectorAll('img'));
     var loaded = Promise.all(imgs.map(function (im) {
       return im.complete ? 1 : new Promise(function (res) {
@@ -589,7 +565,6 @@ h2 .lr + .lr { transition-delay: .14s; }
       if (reduced) return;
       intro.style.display = 'grid';
       intro.classList.remove('leaving');
-      /* restart animations */
       intro.querySelectorAll('.intro-flight, .intro-letter, .intro-seal, .intro-ring, .intro-desk').forEach(function (el) {
         el.style.animation = 'none';
         void el.offsetWidth;
@@ -600,40 +575,20 @@ h2 .lr + .lr { transition-delay: .14s; }
     });
   }
 
-  /* scroll reveals - observer plus a sweep that catches jump-scrolls */
+  /* scroll reveals - a sweep that catches jump-scrolls */
   var sweepTargets = Array.prototype.slice.call(document.querySelectorAll('.reveal, .letter, section h2'));
   function sweep() {
     var vh = window.innerHeight;
     sweepTargets = sweepTargets.filter(function (el) {
       var r = el.getBoundingClientRect();
       if (r.top < vh * 0.92 && r.bottom > -40) { el.classList.add('in'); return false; }
-      if (r.bottom <= -40) { el.classList.add('in'); return false; } /* jumped past it */
+      if (r.bottom <= -40) { el.classList.add('in'); return false; }
       return true;
     });
   }
   sweep();
   window.addEventListener('scroll', sweep, { passive: true });
   window.addEventListener('resize', sweep, { passive: true });
-
-  /* scroll-driven diagram: the ink line draws itself between nodes */
-  var path = document.getElementById('inkpath');
-  var len = path.getTotalLength();
-  path.style.strokeDasharray = len;
-  path.style.strokeDashoffset = reduced ? 0 : len;
-  var nodes = [document.getElementById('node1'), document.getElementById('node2'), document.getElementById('node3')];
-  var caps = [document.getElementById('cap1'), document.getElementById('cap2'), document.getElementById('cap3')];
-  var diagram = document.getElementById('diagram');
-  function drawDiagram() {
-    var r = diagram.getBoundingClientRect();
-    var vh = window.innerHeight;
-    var p = (vh * 0.85 - r.top) / (r.height + vh * 0.35);
-    p = Math.max(0, Math.min(1, p));
-    path.style.strokeDashoffset = reduced ? 0 : len * (1 - p);
-    nodes.forEach(function (n, i) { n.classList.toggle('lit', p > 0.08 + i * 0.33); });
-    caps.forEach(function (c, i) { c.classList.toggle('lit', p > 0.15 + i * 0.33); });
-  }
-  drawDiagram();
-  window.addEventListener('scroll', drawDiagram, { passive: true });
 
   /* magnetic buttons (desktop pointers only) */
   if (!reduced && window.matchMedia('(pointer: fine)').matches) {
@@ -695,12 +650,12 @@ _ERROR_TMPL = """<!doctype html>
 <title>__TITLE__ - Nook</title>
 <link rel="icon" type="image/png" href="__BRAND__/seal.png">
 <style>
-body { background: #F6F1E5; color: #1E3D2F; font-family: Georgia, serif; display: grid; place-items: center; min-height: 100vh; margin: 0; text-align: center; }
-h1 { font-family: 'Fraunces', Georgia, serif; font-weight: 560; font-size: clamp(40px, 8vw, 72px); margin: 18px 0 10px; }
-p { color: #43614F; font-size: 18px; }
-a { color: #1E3D2F; font-family: 'IBM Plex Mono', monospace; font-size: 14px; }
+body { background: #F8F5EE; color: #17130C; font-family: 'Newsreader', Georgia, serif; display: grid; place-items: center; min-height: 100vh; margin: 0; text-align: center; }
+h1 { font-family: 'Oswald', 'Arial Narrow', sans-serif; font-weight: 500; text-transform: uppercase; font-size: clamp(40px, 8vw, 72px); margin: 18px 0 10px; }
+p { color: rgba(23,19,12,.7); font-size: 18px; }
+a { color: #17130C; font-family: 'IBM Plex Mono', monospace; font-size: 14px; }
 img { width: 84px; }
-.num { font-family: 'IBM Plex Mono', monospace; font-size: 13px; letter-spacing: .2em; color: #E8A33D; }
+.num { font-family: 'IBM Plex Mono', monospace; font-size: 13px; letter-spacing: .2em; color: #C2491D; }
 </style></head>
 <body><div>
 <img src="__BRAND__/mark.png" alt="Nook logo">
