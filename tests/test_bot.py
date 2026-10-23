@@ -254,3 +254,14 @@ async def test_start_and_web_send_open_buttons():
     code = button[1].rsplit("=", 1)[1]
     assert len(code) == 6
     assert not set(code) & set("01OIL")  # no ambiguous glyphs
+
+
+@pytest.mark.asyncio
+async def test_start_webkey_sends_login_code():
+    import digest as dg
+    store, sent = FakeStore(), []
+    nook = make_bot(store, sent)
+    await nook.handle_update(update(1, "/start webkey"))
+    button = sent[-1][2]
+    assert button[0] == "Open Nook" and button[1].startswith(dg.APP_URL + "/app?key=")
+    assert len(button[1].rsplit("=", 1)[1]) == 6
