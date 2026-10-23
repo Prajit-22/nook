@@ -59,6 +59,28 @@ body::before {
 
 ::selection { background: rgba(232,163,61,.4); }
 
+/* ---------- intro animation (once per session) ---------- */
+#intro { position: fixed; inset: 0; z-index: 50; background: var(--paper); display: none;
+  place-items: center; background-image: radial-gradient(rgba(30,61,47,.05) 1px, transparent 1px); background-size: 22px 22px; }
+#intro.play { display: grid; animation: introfade .5s ease 1.9s forwards; }
+@keyframes introfade { to { opacity: 0; visibility: hidden; } }
+.intro-inner { position: relative; width: 200px; height: 260px; }
+.intro-magpie { position: absolute; top: -30px; left: 50%; width: 120px; border-radius: 4px;
+  transform: translateX(-50%); animation: magdrop 1s var(--ease-out) .1s both; }
+@keyframes magdrop { from { transform: translate(-50%, -140px) rotate(-6deg); opacity: 0; }
+  to { transform: translate(-50%, 0) rotate(0); opacity: 1; } }
+.intro-letter { position: absolute; bottom: 0; left: 50%; width: 150px; height: 95px;
+  background: #FDFBF4; border: 1px solid var(--rule); transform: translateX(-50%);
+  box-shadow: 0 10px 24px -12px rgba(30,61,47,.4); animation: letterin .6s var(--ease-out) .7s both; }
+@keyframes letterin { from { transform: translate(-50%, 30px); opacity: 0; } to { transform: translate(-50%, 0); opacity: 1; } }
+.intro-seal { position: absolute; right: -18px; bottom: -18px; width: 58px;
+  animation: introstamp .45s var(--ease-spring) 1.35s both; }
+@keyframes introstamp { 0% { opacity: 0; transform: scale(1.8) rotate(10deg); }
+  60% { opacity: 1; transform: scale(.92) rotate(6deg); } 100% { opacity: 1; transform: scale(1) rotate(8deg); } }
+.intro-skip { position: absolute; bottom: 26px; left: 50%; transform: translateX(-50%);
+  font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-faint); }
+@media (prefers-reduced-motion: reduce) { #intro.play { display: none; } }
+
 /* ---------- load choreography ---------- */
 .rise { opacity: 0; transform: translateY(18px); }
 body.ready .rise { opacity: 1; transform: none; transition: opacity .8s var(--ease-out), transform .8s var(--ease-out); }
@@ -290,6 +312,13 @@ footer .colophon a:hover { color: var(--wax); border-color: var(--wax); }
 </style>
 </head>
 <body>
+<div id="intro" aria-hidden="true">
+  <div class="intro-inner">
+    <img class="intro-magpie" src="__BRAND__/magpie.jpg" alt="">
+    <div class="intro-letter"><img class="intro-seal" src="__BRAND__/seal.png" alt=""></div>
+  </div>
+  <div class="intro-skip mono">tap to skip</div>
+</div>
 <div class="page">
 
 <header>
@@ -470,6 +499,18 @@ footer .colophon a:hover { color: var(--wax); border-color: var(--wax); }
   h1.textContent = '';
   frag.forEach(function (c) { h1.appendChild(c); });
 
+  /* intro: once per session, ~2s, skippable, never blocks first paint */
+  var intro = document.getElementById('intro');
+  if (!reduced && !sessionStorage.getItem('nook-intro-seen')) {
+    intro.classList.add('play');
+    var dismiss = function () {
+      intro.style.display = 'none';
+      sessionStorage.setItem('nook-intro-seen', '1');
+      document.body.classList.add('ready');
+    };
+    intro.addEventListener('click', dismiss);
+    setTimeout(dismiss, 2500);
+  }
   document.body.classList.add('ready');
 
   /* scroll reveals - observer plus a sweep that catches jump-scrolls */
