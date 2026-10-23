@@ -338,14 +338,14 @@ section h2.in .lr:nth-child(2) { transition-delay: .12s }
 
 <div class="hero">
   <div>
-    <div class="kicker rise d2"><span class="kicker-line"></span>Read-it-later + job digest Â· a Telegram bot</div>
+    <div class="kicker rise d2"><span class="kicker-line"></span>Read-it-later + job digest · a Telegram bot</div>
     <h1 aria-label="Save everything. Read what matters.">Save everything.<br>Read what <em>matters</em><span class="sq" aria-hidden="true"></span></h1>
     <p class="lede rise d4">Nook is a Telegram bot with a magpie's habits. Toss it a link any time; it fetches, summarizes and files each one. At 08:00 sharp you get one sealed letter: what you saved, what it says, and which paid openings are worth your morning.</p>
     <div class="cta rise d5">
       <a class="btn primary" href="https://t.me/Nook_digest_bot">Talk to @Nook_digest_bot</a>
       <a class="btn ghost" href="/app">Enter the web app</a>
     </div>
-    <p class="micro rise d6">Cloudflare free tier Â· no server Â· no docker Â· no bill</p>
+    <p class="micro rise d6">Cloudflare free tier · no server · no docker · no bill</p>
   </div>
   <figure class="rise d3">
     <img class="seal" src="__BRAND__/seal.png" alt="">
@@ -379,7 +379,7 @@ section h2.in .lr:nth-child(2) { transition-delay: .12s }
 <div class="page">
 
 <section id="how">
-  <div class="mast"><span>01 Â· How it works</span><span class="r">The collector</span></div>
+  <div class="mast"><span>01 · How it works</span><span class="r">The collector</span></div>
   <h2>Magpies hoard shiny things.<br>Yours hoards <em>links</em>.</h2>
   <div class="rows">
     <div class="row2 reveal">
@@ -387,7 +387,7 @@ section h2.in .lr:nth-child(2) { transition-delay: .12s }
       <h3>Send anything</h3>
       <div class="body">
         <p>A link, or a thought with /note. The page is fetched at the edge, an LLM writes a two-sentence summary with tags, and it lands on your shelf.</p>
-        <div class="meta">Webhook Â· secret-verified</div>
+        <div class="meta">Webhook · secret-verified</div>
       </div>
     </div>
     <div class="row2 reveal">
@@ -395,7 +395,7 @@ section h2.in .lr:nth-child(2) { transition-delay: .12s }
       <h3>Ask it back</h3>
       <div class="body">
         <p>Plain questions search your whole nook with BM25 and answer with cited sources. Send the same link twice and it is recognized, not re-filed.</p>
-        <div class="meta">D1 + FTS5 Â· sha256 dedup</div>
+        <div class="meta">D1 + FTS5 · sha256 dedup</div>
       </div>
     </div>
     <div class="row2 reveal">
@@ -403,14 +403,14 @@ section h2.in .lr:nth-child(2) { transition-delay: .12s }
       <h3>Forget on command</h3>
       <div class="body">
         <p>/list shows recent saves, /forget removes one. The database lives in your own Cloudflare account; your clippings never sit on anyone else's shelf.</p>
-        <div class="meta">Your account Â· your data</div>
+        <div class="meta">Your account · your data</div>
       </div>
     </div>
   </div>
 </section>
 
 <section id="letter">
-  <div class="mast"><span>02 Â· The morning letter</span><span class="r">Sealed Â· delivered once</span></div>
+  <div class="mast"><span>02 · The morning letter</span><span class="r">Sealed · delivered once</span></div>
   <h2>One sealed digest,<br>08:00 <em>sharp</em>.</h2>
   <div class="letter-wrap">
     <div>
@@ -419,14 +419,14 @@ section h2.in .lr:nth-child(2) { transition-delay: .12s }
       <div class="rule-note reveal"><b>Exactly once</b><p>Every opening is hashed against your history. The letter never repeats itself.</p></div>
     </div>
     <div class="letter" id="letter">
-      <div class="lh"><span class="t">Nook Â· The Morning Letter</span><span class="d">No. 214 Â· Fri 24 Oct Â· 08:00 IST</span></div>
+      <div class="lh"><span class="t">Nook · The Morning Letter</span><span class="d">No. 214 · Fri 24 Oct · 08:00 IST</span></div>
       <p class="salut">Good morning. Three reads you filed, two openings worth your first coffee.</p>
-      <div class="sec-h">In your nook Â· 3 unread</div>
-      <div class="item"><b>Vector indexes, explained simply</b><small>Why HNSW wins at recall per millisecond, in pictures.</small><span class="u">simonwillison.net Â· 12 min Â· #vectors</span></div>
-      <div class="item"><b>The $0 LLM stack</b><small>Free tiers compared honestly: what breaks first and when.</small><span class="u">github.com Â· 8 min Â· #infra</span></div>
-      <div class="sec-h">Fresh openings Â· paid, checked at send</div>
-      <div class="job"><div><span class="role">Python Development Intern</span> <span class="co">Digitap.ai Â· Bengaluru</span><span class="new">New</span></div><div class="pay">â¹15-18k/mo</div><div class="by">Apply by 12 Nov</div></div>
-      <div class="job"><div><span class="role">Junior Backend Engineer</span> <span class="co">Northwind Â· Remote</span></div><div class="pay">â¹6-9 LPA</div><div class="by">Apply by 30 Oct</div></div>
+      <div class="sec-h">In your nook · 3 unread</div>
+      <div class="item"><b>Vector indexes, explained simply</b><small>Why HNSW wins at recall per millisecond, in pictures.</small><span class="u">simonwillison.net · 12 min · #vectors</span></div>
+      <div class="item"><b>The $0 LLM stack</b><small>Free tiers compared honestly: what breaks first and when.</small><span class="u">github.com · 8 min · #infra</span></div>
+      <div class="sec-h">Fresh openings · paid, checked at send</div>
+      <div class="job"><div><span class="role">Python Development Intern</span> <span class="co">Digitap.ai · Bengaluru</span><span class="new">New</span></div><div class="pay">₹15-18k/mo</div><div class="by">Apply by 12 Nov</div></div>
+      <div class="job"><div><span class="role">Junior Backend Engineer</span> <span class="co">Northwind · Remote</span></div><div class="pay">₹6-9 LPA</div><div class="by">Apply by 30 Oct</div></div>
       <p class="sign">your magpie,</p>
       <img class="seal" src="__BRAND__/seal.png" alt="A wax seal stamped with an N">
     </div>
@@ -434,7 +434,7 @@ section h2.in .lr:nth-child(2) { transition-delay: .12s }
 </section>
 
 <section id="stack">
-  <div class="mast"><span>03 Â· Under the feathers</span><span class="r">One worker Â· four free services</span></div>
+  <div class="mast"><span>03 · Under the feathers</span><span class="r">One worker · four free services</span></div>
   <h2>Zero servers,<br>zero <em>maintenance</em>.</h2>
   <div class="spec">
     <div class="row reveal"><span class="k">Telegram</span><span class="v"><b>Webhook in, letter out.</b> HMAC secret checked on every call; forged updates are dropped unread.</span><span class="c">@Nook_digest_bot</span></div>
@@ -442,11 +442,11 @@ section h2.in .lr:nth-child(2) { transition-delay: .12s }
     <div class="row reveal"><span class="k">D1 + FTS5</span><span class="v"><b>Your shelf.</b> SQLite with BM25 full-text search and sha256 dedup.</span><span class="c">Your account</span></div>
     <div class="row reveal"><span class="k">Cron</span><span class="v"><b>The 08:00 alarm.</b> One trigger, one letter, then silence for 24 hours.</span><span class="c">30 2 * * *</span></div>
   </div>
-  <p class="margin-note reveal">67 unit tests Â· CI on every push</p>
+  <p class="margin-note reveal">67 unit tests · CI on every push</p>
 </section>
 
 <section id="selfhost">
-  <div class="mast"><span>04 Â· Keep your own magpie</span><span class="r">MIT Â· self-hosted</span></div>
+  <div class="mast"><span>04 · Keep your own magpie</span><span class="r">MIT · self-hosted</span></div>
   <h2>Deploy your own<br>in five <em>minutes</em>.</h2>
   <div class="self-grid">
     <div>
@@ -458,7 +458,7 @@ section h2.in .lr:nth-child(2) { transition-delay: .12s }
     </div>
     <div class="reveal">
       <div class="code"><span class="p">$</span> git clone github.com/Prajit-22/nook<br><span class="p">$</span> wrangler d1 create nook-db<br><span class="p">$</span> wrangler deploy<br><span class="c"># the webhook registers itself</span></div>
-      <div class="code-cap">Three commands Â· your account Â· your data</div>
+      <div class="code-cap">Three commands · your account · your data</div>
     </div>
   </div>
 </section>
@@ -474,9 +474,9 @@ section h2.in .lr:nth-child(2) { transition-delay: .12s }
     </div>
     <p class="quip">No magpies were rushed in the making of your digest.</p>
     <footer>
-      <span>Nook Â· a magpie for your links</span>
+      <span>Nook · a magpie for your links</span>
       <span>Set in Oswald, Newsreader + Plex Mono</span>
-      <span><a href="https://github.com/Prajit-22/nook">Prajit-22/nook</a> Â· MIT Â· Â© 2026</span>
+      <span><a href="https://github.com/Prajit-22/nook">Prajit-22/nook</a> · MIT · © 2026</span>
     </footer>
   </div>
 </div>
