@@ -1,3 +1,5 @@
+APP_URL = "https://nook.prjtchaturvedi.workers.dev"
+
 """Plain-text formatting for the two digest halves (reads + jobs) and the
 bot's static copy. Telegram auto-links bare URLs, so no markup needed."""
 
