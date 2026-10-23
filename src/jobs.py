@@ -44,7 +44,12 @@ def parse_remoteok(data):
             lo, hi = 0, 0
         salary = ""
         if lo or hi:
-            salary = f"${lo // 1000}k-${hi // 1000}k/yr" if hi else f"${lo // 1000}k+/yr"
+            if not hi:
+                salary = f"${lo // 1000}k+/yr"
+            elif hi == lo:
+                salary = f"${lo // 1000}k/yr"
+            else:
+                salary = f"${lo // 1000}k-${hi // 1000}k/yr"
         jobs.append({
             "source": "remoteok",
             "key": f"remoteok:{raw.get('id') or raw.get('url')}",
@@ -85,9 +90,15 @@ def parse_keywords(raw: str):
     return [part.strip().lower() for part in (raw or "").split(",") if part.strip()]
 
 
+def _kw_re(kw: str):
+    import re
+    # Whole-word match: 'ai' must not ride along inside 'Plaid' or 'email'.
+    return re.compile(r"(?<![a-z0-9])" + re.escape(kw) + r"(?![a-z0-9])")
+
+
 def matches(job: dict, keywords) -> bool:
     haystack = " ".join([job.get("title", ""), job.get("company", ""), " ".join(job.get("tags", []))]).lower()
-    return any(kw in haystack for kw in keywords)
+    return any(_kw_re(kw).search(haystack) for kw in keywords)
 
 
 def is_early_career(job: dict) -> bool:
@@ -141,9 +152,20 @@ def is_fresher_relevant(job: dict) -> bool:
     return not any(phrase in joined for phrase in SENIOR_PHRASES)
 
 
+def _norm_key(text) -> str:
+    import re
+    # Dedup key blind to punctuation and spacing, so 'Engineer, AI Tasks'
+    # and 'Engineer AI Tasks' count as the same role.
+    return re.sub(r"[^a-z0-9]+", "", str(text or "").lower())
+
+
 def select_jobs(jobs, keywords, paid_only=True, limit=6, exclude_keys=frozenset()):
     """Filter to paid, keyword-matching, unsent openings; early-career first,
     newest next; dedup by (title, company) so cross-posted roles appear once."""
+    if isinstance(keywords, str):
+        # Env vars arrive as one comma string; iterating a string would match
+        # single characters, so parse first.
+        keywords = parse_keywords(keywords)
     out = []
     seen_pairs = set()
     for job in jobs:
@@ -157,7 +179,7 @@ def select_jobs(jobs, keywords, paid_only=True, limit=6, exclude_keys=frozenset(
             continue
         if keywords and not matches(job, keywords):
             continue
-        pair = (job["title"].lower(), job.get("company", "").lower())
+        pair = (_norm_key(job["title"]), _norm_key(job.get("company")))
         if pair in seen_pairs:
             continue
         seen_pairs.add(pair)
