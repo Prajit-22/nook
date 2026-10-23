@@ -35,8 +35,12 @@ class Nook:
         cmd, rest = self._split_command(text)
         if cmd == "start":
             await self._store.subscribe(chat_id)
-            await self._send(chat_id, dg.WELCOME,
-                             url_button=("Open Nook", dg.APP_URL + "/app"))
+            if rest.lower() == "webkey":
+                # Deep link from the web sign-in page: hand over a key directly.
+                await self._web_code(chat_id)
+            else:
+                await self._send(chat_id, dg.WELCOME,
+                                 url_button=("Open Nook", dg.APP_URL + "/app"))
         elif cmd in ("help", "commands"):
             await self._send(chat_id, dg.HELP)
         elif cmd == "stop":
