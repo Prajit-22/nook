@@ -122,3 +122,34 @@ def test_select_jobs_drops_gibberish_and_senior():
     ]
     picked = select_jobs(feed, ["backend", "python"], paid_only=True)
     assert [j["key"] for j in picked] == ["c"]
+
+
+def test_keyword_match_is_whole_word():
+    # 'ai' must not match inside 'Plaid'; a standalone AI must.
+    kws = parse_keywords("ai,backend")
+    plaid = {"title": "Accounting Operations", "company": "Plaid", "tags": ["finance"], "url": "u", "salary": "$1"}
+    dev = {"title": "Backend Engineer, AI tooling", "company": "Acme", "tags": [], "url": "u", "salary": "$1"}
+    assert not matches(plaid, kws)
+    assert matches(dev, kws)
+
+
+def test_select_jobs_dedups_punctuation_variants():
+    kws = parse_keywords("ai")
+    a = {"title": "Software Engineer, AI Coding Tasks", "company": "Askable", "url": "u1", "salary": "$1", "tags": [], "key": "k1", "date": "2026-01-02"}
+    b = {"title": "Software Engineer AI Coding Tasks", "company": "Askable", "url": "u2", "salary": "$1", "tags": [], "key": "k2", "date": "2026-01-01"}
+    out = select_jobs([a, b], kws)
+    assert len(out) == 1
+
+
+def test_remoteok_equal_min_max_salary_collapses():
+    jobs = parse_remoteok([{}, {"position": "Dev", "company": "X", "url": "u", "salary_min": 10000, "salary_max": 10000, "id": 1}])
+    assert jobs[0]["salary"] == "$10k/yr"
+
+
+def test_select_jobs_accepts_raw_keyword_string():
+    feed = [
+        {"title": "Accounting Operations", "company": "Plaid", "url": "u1", "salary": "$1", "tags": ["finance"], "key": "k1", "date": "2026-01-02"},
+        {"title": "Backend Engineer", "company": "Acme", "url": "u2", "salary": "$1", "tags": [], "key": "k2", "date": "2026-01-01"},
+    ]
+    out = select_jobs(feed, "backend,ai")  # raw string, as env.JOB_KEYWORDS arrives
+    assert [j["company"] for j in out] == ["Acme"]
