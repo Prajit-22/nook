@@ -64,7 +64,7 @@ MANIFEST = {
     },
 }
 
-SERVICE_WORKER = """const CACHE = 'nook-v1';
+SERVICE_WORKER = """const CACHE = 'nook-v2';
 self.addEventListener('install', (e) => { self.skipWaiting(); });
 self.addEventListener('activate', (e) => { e.waitUntil(clients.claim()); });
 self.addEventListener('fetch', (e) => {
@@ -175,12 +175,20 @@ LOGIN_HTML = """<!doctype html>
 <p class="note">no password, no email - the bot already knows you</p>
 </div></div>
 <script>
-document.getElementById('f').addEventListener('submit', async (e) => {
-  e.preventDefault();
-  const code = document.getElementById('code').value.trim().toUpperCase();
+async function tryCode(code) {
   const r = await fetch('/app/login', { method: 'POST', headers: {'content-type':'application/json'}, body: JSON.stringify({code}) });
-  if (r.ok) { location.href = '/app'; } else { document.getElementById('err').textContent = 'That code did not open anything - ask the bot for a fresh one.'; }
+  if (r.ok) { location.href = '/app'; }
+  else { document.getElementById('err').textContent = 'That code did not work. Keys last ten minutes and work once - send /web to @Nook_digest_bot for a new one.'; }
+}
+document.getElementById('f').addEventListener('submit', (e) => {
+  e.preventDefault();
+  tryCode(document.getElementById('code').value);
 });
+const fromLink = new URLSearchParams(location.search).get('key');
+if (fromLink) {
+  document.getElementById('code').value = fromLink.toUpperCase();
+  tryCode(fromLink);
+}
 </script>
 </body></html>
 """.replace("__HEAD__", _HEAD).replace("__CSS__", _CSS)
