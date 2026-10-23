@@ -134,7 +134,8 @@ class Default(WorkerEntrypoint):
                 body = body.to_py()
         except Exception:
             body = {}
-        code = str(body.get("code", "")).strip().upper() if isinstance(body, dict) else ""
+        raw = str(body.get("code", "")) if isinstance(body, dict) else ""
+        code = "".join(ch for ch in raw if ch.isalnum()).upper()
         if not code:
             return Response("bad code", status=400)
         chat_id = await self._store().consume_web_code(code)
@@ -280,9 +281,11 @@ class Default(WorkerEntrypoint):
         )
         return (await resp.json()).to_py()
 
-    async def _send(self, chat_id, text):
-        for part in split_message(text):
-            await self._post_telegram("sendMessage", build_send_payload(chat_id, part))
+    async def _send(self, chat_id, text, url_button=None):
+        parts = split_message(text)
+        for i, part in enumerate(parts):
+            button = url_button if i == len(parts) - 1 else None
+            await self._post_telegram("sendMessage", build_send_payload(chat_id, part, button))
 
     async def _fetch_page(self, url):
         try:
