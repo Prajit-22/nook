@@ -1,6 +1,6 @@
 """Nook web app (PWA): session auth via one-time code the bot DMs you,
-plus the app shell, manifest and service worker. Same ink style as the
-landing page. All state stays in D1, keyed by chat_id."""
+plus the app shell, manifest and service worker. Same editorial grid style
+as the landing page. All state stays in D1, keyed by chat_id."""
 
 import base64
 import hashlib
@@ -51,8 +51,8 @@ MANIFEST = {
     "start_url": "/app",
     "scope": "/",
     "display": "standalone",
-    "background_color": "#F6F1E5",
-    "theme_color": "#F6F1E5",
+    "background_color": "#F8F5EE",
+    "theme_color": "#F8F5EE",
     "icons": [
         {"src": "/brand/avatar.png", "sizes": "640x640", "type": "image/png", "purpose": "any"},
         {"src": "/brand/avatar.png", "sizes": "640x640", "type": "image/png", "purpose": "maskable"},
@@ -87,66 +87,64 @@ _HEAD = """<meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <link rel="icon" type="image/png" href="/brand/seal.png">
 <link rel="manifest" href="/app/manifest.webmanifest">
-<meta name="theme-color" content="#F6F1E5">
+<meta name="theme-color" content="#F8F5EE">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <link rel="apple-touch-icon" href="/brand/avatar.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=IBM+Plex+Mono:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">"""
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400;1,6..72,500&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">"""
 
 _CSS = """
-:root { --paper:#F6F1E5; --ink:#1E3D2F; --ink-soft:#43614F; --ink-faint:#7b8f82; --wax:#E8A33D;
-  --rule:rgba(30,61,47,.22); --rule-soft:rgba(30,61,47,.12); --ease:cubic-bezier(.22,1,.36,1); }
+:root { --paper:#F8F5EE; --card:#FFFDF6; --ink:#17130C; --ink-soft:rgba(23,19,12,.7); --ink-faint:rgba(23,19,12,.42); --wax:#C2491D;
+  --rule:rgba(23,19,12,.16); --rule-soft:rgba(23,19,12,.09); --ease:cubic-bezier(.22,1,.36,1); }
 * { margin:0; padding:0; box-sizing:border-box; }
-body { background:var(--paper); color:var(--ink); font-family:Georgia,serif; -webkit-font-smoothing:antialiased;
-  background-image:radial-gradient(rgba(30,61,47,.05) 1px,transparent 1px); background-size:22px 22px; }
+body { background:var(--paper); color:var(--ink); font-family:'Newsreader',Georgia,serif; -webkit-font-smoothing:antialiased; }
 .mono { font-family:'IBM Plex Mono',monospace; }
 .wrap { max-width:920px; margin:0 auto; padding:0 20px 90px; }
 header { display:flex; align-items:center; justify-content:space-between; padding:18px 0 16px; border-bottom:1px solid var(--rule);
   position:sticky; top:0; background:rgba(246,241,229,.92); backdrop-filter:blur(6px); z-index:5; }
 .brand { display:flex; align-items:center; gap:10px; }
 .brand img { width:34px; height:34px; }
-.brand .word { font-family:'Fraunces',serif; font-weight:600; font-size:22px; }
-.btn { font-family:'IBM Plex Mono',monospace; font-size:13px; text-decoration:none; padding:11px 20px; border-radius:999px;
-  border:1.5px solid var(--ink); color:var(--ink); background:none; cursor:pointer; transition:all .25s var(--ease); }
+.brand .word { font-family:'Oswald',sans-serif; font-weight:600; font-size:20px; letter-spacing:.12em; text-transform:uppercase; }
+.btn { font-family:'IBM Plex Mono',monospace; font-size:12px; letter-spacing:.08em; text-transform:uppercase; text-decoration:none; padding:12px 20px;
+  border:1px solid var(--ink); color:var(--ink); background:none; cursor:pointer; transition:all .25s var(--ease); }
 .btn.primary { background:var(--ink); color:var(--paper); }
-.btn.primary:hover { background:var(--wax); border-color:var(--wax); color:var(--ink); }
+.btn.primary:hover { background:var(--wax); border-color:var(--wax); color:var(--paper); }
 nav.tabs { display:flex; gap:4px; margin:22px 0 26px; border-bottom:1px solid var(--rule); }
 nav.tabs button { font-family:'IBM Plex Mono',monospace; font-size:13px; background:none; border:none; color:var(--ink-soft);
   padding:10px 14px; cursor:pointer; border-bottom:2px solid transparent; margin-bottom:-1px; }
 nav.tabs button.on { color:var(--ink); border-bottom-color:var(--wax); }
 .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:22px; }
-.clip { position:relative; background:#FBF8EF; border:1px solid var(--rule-soft); padding:20px 18px 16px;
-  box-shadow:0 2px 0 rgba(30,61,47,.08), 0 12px 22px -16px rgba(30,61,47,.35);
+.clip { position:relative; background:var(--card); border:1px solid var(--rule); padding:20px 18px 16px;
+  box-shadow:6px 6px 0 rgba(23,19,12,.05);
   animation:clipin .5s var(--ease) both; }
-.clip:nth-child(3n+1) { transform:rotate(-.7deg); } .clip:nth-child(3n+2) { transform:rotate(.5deg); }
-.clip::before { content:""; position:absolute; top:-9px; left:18px; width:52px; height:18px; background:rgba(232,163,61,.6); transform:rotate(-4deg); }
+.clip::before { content:""; position:absolute; top:-1px; left:-1px; width:26px; height:5px; background:var(--wax); }
 @keyframes clipin { from { opacity:0; transform:translateY(14px) rotate(-1deg); } }
 .clip .id { font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--wax); letter-spacing:.12em; }
-.clip h3 { font-family:'Fraunces',serif; font-weight:600; font-size:17.5px; margin:8px 0 6px; line-height:1.25; }
+.clip h3 { font-family:'Newsreader',serif; font-weight:600; font-size:17.5px; margin:8px 0 6px; line-height:1.25; }
 .clip h3 a { color:var(--ink); text-decoration:none; border-bottom:1px solid transparent; }
 .clip h3 a:hover { border-bottom-color:var(--wax); }
 .clip p { font-size:13.5px; color:var(--ink-soft); line-height:1.55; }
 .clip .tags { margin-top:10px; font-family:'IBM Plex Mono',monospace; font-size:10.5px; color:var(--ink-faint); }
-.clip .tags span { border:1px solid var(--rule-soft); border-radius:999px; padding:2px 8px; margin-right:5px; }
+.clip .tags span { border:1px solid var(--rule-soft); padding:2px 8px; margin-right:5px; }
 .bar { display:flex; gap:10px; margin-bottom:24px; }
-.bar input { flex:1; font-family:'IBM Plex Mono',monospace; font-size:14px; padding:12px 16px; border:1.5px solid var(--rule);
-  border-radius:999px; background:rgba(255,255,255,.6); color:var(--ink); outline:none; }
+.bar input { flex:1; font-family:'IBM Plex Mono',monospace; font-size:14px; padding:12px 16px; border:1px solid var(--rule);
+  background:var(--card); color:var(--ink); outline:none; }
 .bar input:focus { border-color:var(--ink); }
-.empty { text-align:center; padding:70px 20px; color:var(--ink-soft); font-style:italic; font-family:'Fraunces',serif; font-size:19px; }
+.empty { text-align:center; padding:70px 20px; color:var(--ink-soft); font-style:italic; font-family:'Newsreader',serif; font-size:19px; }
 .note { font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--ink-faint); text-align:center; margin-top:10px; }
-.answer { background:#FDFBF4; border:1px solid var(--rule-soft); padding:22px 20px; margin-bottom:24px; font-size:15.5px; line-height:1.65; }
+.answer { background:var(--card); border:1px solid var(--rule); padding:22px 20px; margin-bottom:24px; font-size:15.5px; line-height:1.65; }
 .answer .q { font-family:'IBM Plex Mono',monospace; font-size:11.5px; letter-spacing:.12em; text-transform:uppercase; color:var(--wax); margin-bottom:10px; }
-.letter { position:relative; background:#FDFBF4; border:1px solid var(--rule-soft); padding:34px 28px 28px; max-width:560px; margin:0 auto;
-  box-shadow:0 2px 0 rgba(30,61,47,.08), 0 18px 30px -18px rgba(30,61,47,.35); }
+.letter { position:relative; background:var(--card); border:1px solid var(--rule); padding:34px 28px 28px; max-width:560px; margin:0 auto;
+  box-shadow:8px 8px 0 rgba(23,19,12,.05); }
 .letter .lh { display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap; border-bottom:1px solid var(--rule); padding-bottom:10px;
   font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-soft); }
 .letter .sec-h { font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--wax); margin-top:20px; }
 .letter .item { margin-top:10px; font-size:14.5px; line-height:1.55; }
 .letter .item small { display:block; color:var(--ink-soft); }
 .letter .item .u { font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--ink-faint); }
-.job { background:#FBF8EF; border:1px solid var(--rule-soft); padding:18px 18px 14px; margin-bottom:16px; }
-.job b { font-family:'Fraunces',serif; font-size:17px; }
+.job { background:var(--card); border:1px solid var(--rule); padding:18px 18px 14px; margin-bottom:16px; }
+.job b { font-family:'Newsreader',serif; font-weight:600; font-size:17px; }
 .job a { color:var(--ink); }
 .job .meta { font-family:'IBM Plex Mono',monospace; font-size:11.5px; color:var(--ink-soft); margin-top:6px; }
 .spinner { text-align:center; padding:50px; font-family:'IBM Plex Mono',monospace; font-size:13px; color:var(--ink-faint); }
@@ -159,12 +157,12 @@ LOGIN_HTML = """<!doctype html>
 <style>__CSS__
 .login { max-width:420px; margin:12vh auto 0; text-align:center; }
 .login img { width:88px; }
-.login h1 { font-family:'Fraunces',serif; font-weight:560; font-size:34px; margin:18px 0 10px; }
+.login h1 { font-family:'Oswald',sans-serif; font-weight:500; text-transform:uppercase; font-size:36px; letter-spacing:.01em; margin:18px 0 10px; }
 .login p { color:var(--ink-soft); font-size:15.5px; line-height:1.65; }
 .login .bar { margin-top:28px; }
 .login input { text-align:center; letter-spacing:.3em; text-transform:uppercase; }
 .login .err { color:#A4452B; font-family:'IBM Plex Mono',monospace; font-size:12.5px; margin-top:12px; min-height:1.2em; }
-.login code { font-family:'IBM Plex Mono',monospace; background:rgba(30,61,47,.07); padding:2px 8px; border-radius:4px; }
+.login code { font-family:'IBM Plex Mono',monospace; background:rgba(23,19,12,.07); padding:2px 8px; }
 </style></head>
 <body><div class="wrap"><div class="login">
 <img src="/brand/mark.png" alt="Nook">
@@ -238,7 +236,7 @@ async function load(tab) {
     main.innerHTML = `<div class="letter"><div class="lh"><span>Nook - The Morning Letter</span><span>${new Date().toDateString()}</span></div>
       <div class="sec-h">In your nook - ${d.reads.length} unread</div>${reads || '<div class="item">All caught up.</div>'}
       <div class="sec-h">Fresh openings - paid, checked now</div>${jobs || '<div class="item">Nothing fresh right now.</div>'}
-      <p style="font-family:Fraunces,serif;font-style:italic;color:var(--ink-soft);margin-top:22px">- your magpie</p></div>`;
+      <p style="font-family:Newsreader,serif;font-style:italic;color:var(--ink-soft);margin-top:22px">- your magpie</p></div>`;
   } else if (tab === 'jobs') {
     const jobs = await (await fetch('/api/jobs')).json();
     main.innerHTML = jobs.length ? jobs.map(j => `<div class="job"><b><a href="${esc(j.url)}">${esc(j.title)}</a></b> @ ${esc(j.company)}<div class="meta">${esc(j.salary)} &middot; ${esc((j.url||'').replace(/^https?:\\/\\//,'').split('/')[0])}</div></div>`).join('') : '<div class="empty">No fresh openings right now.</div>';
