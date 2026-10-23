@@ -72,6 +72,13 @@ class Default(WorkerEntrypoint):
             if path == "/app/sw.js":
                 return Response(SERVICE_WORKER, headers={
                     "content-type": "application/javascript", "cache-control": "no-store"})
+            if path == "/app/logout":
+                # Expire the stateless session cookie on this device, then
+                # bounce to /app, which answers with the sign-in page.
+                return Response("", status=302, headers={
+                    "location": "/app",
+                    "set-cookie": "%s=; Path=/; Max-Age=0; HttpOnly; Secure; SameSite=Lax"
+                    % SESSION_COOKIE})
             if path in ("/app", "/share"):
                 chat_id = self._session_chat(request)
                 if chat_id is None:
