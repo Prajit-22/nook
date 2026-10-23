@@ -210,7 +210,7 @@ h2 .lr { clip-path: inset(0 0 0 0); }
 .letter .lh { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap;
   border-bottom: 3px double var(--rule-strong); padding-bottom: 12px; }
 .letter .lh .t { font-family: 'Oswald', sans-serif; font-weight: 600; font-size: 19px; letter-spacing: .06em; text-transform: uppercase; }
-.letter .lh .d { font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-55); }
+.letter .lh .d { font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase; color: var(--wax); border: 1px solid var(--wax); padding: 3px 9px; }
 .letter .salut { font-style: italic; font-size: 18px; color: var(--ink-70); padding: 16px 0 6px; }
 .letter .sec-h { display: flex; align-items: center; gap: 14px;
   font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; letter-spacing: .18em; text-transform: uppercase; color: var(--ink-55);
@@ -338,14 +338,14 @@ section h2.in .lr:nth-child(2) { transition-delay: .12s }
 
 <div class="hero">
   <div>
-    <div class="kicker rise d2"><span class="kicker-line"></span>Read-it-later + job digest · a Telegram bot</div>
+    <div class="kicker rise d2"><span class="kicker-line"></span>Read-it-later + job digest · Telegram bot + web app</div>
     <h1 aria-label="Save everything. Read what matters.">Save everything.<br>Read what <em>matters</em><span class="sq" aria-hidden="true"></span></h1>
-    <p class="lede rise d4">Nook is a Telegram bot with a magpie's habits. Toss it a link any time; it fetches, summarizes and files each one. At 08:00 sharp you get one sealed letter: what you saved, what it says, and which paid openings are worth your morning.</p>
+    <p class="lede rise d4">Nook is a Telegram bot with a magpie's habits, plus a web app for your desk. Toss it a link any time; it fetches, summarizes and files each one. At 08:00 sharp you get one sealed letter: what you saved, what it says, and which paid openings are worth your morning. The app puts the whole pile in your browser - search it, ask it questions, file links from your laptop.</p>
     <div class="cta rise d5">
       <a class="btn primary" href="https://t.me/Nook_digest_bot">Talk to @Nook_digest_bot</a>
       <a class="btn ghost" href="/app">Enter the web app</a>
     </div>
-    <p class="micro rise d6">Cloudflare free tier · no server · no docker · no bill</p>
+    <p class="micro rise d6">Cloudflare free tier · no server · no docker · self-hosted</p>
   </div>
   <figure class="rise d3">
     <img class="seal" src="__BRAND__/seal.png" alt="">
@@ -415,19 +415,19 @@ section h2.in .lr:nth-child(2) { transition-delay: .12s }
   <div class="letter-wrap">
     <div>
       <div class="rule-note reveal"><b>Reads first</b><p>Whatever you saved and never opened rides at the top, one line of summary each, source attached.</p></div>
-      <div class="rule-note reveal"><b>Then openings</b><p>Job boards are queried at send time, not cached overnight. If a listing is dead by morning, it never reaches you.</p></div>
+      <div class="rule-note reveal"><b>Then openings</b><p>Job boards are queried at send time, not cached overnight, so the letter reflects what the boards list that morning.</p></div>
       <div class="rule-note reveal"><b>Exactly once</b><p>Every opening is hashed against your history. The letter never repeats itself.</p></div>
     </div>
     <div class="letter" id="letter">
-      <div class="lh"><span class="t">Nook · The Morning Letter</span><span class="d">No. 214 · Fri 24 Oct · 08:00 IST</span></div>
-      <p class="salut">Good morning. Three reads you filed, two openings worth your first coffee.</p>
+      <div class="lh"><span class="t">Nook · The Morning Letter</span><span class="d">Sample · 08:00 IST</span></div>
+      <p class="salut">Good morning. Your Nook letter, sealed and delivered:</p>
       <div class="sec-h">In your nook · 3 unread</div>
-      <div class="item"><b>Vector indexes, explained simply</b><small>Why HNSW wins at recall per millisecond, in pictures.</small><span class="u">simonwillison.net · 12 min · #vectors</span></div>
-      <div class="item"><b>The $0 LLM stack</b><small>Free tiers compared honestly: what breaks first and when.</small><span class="u">github.com · 8 min · #infra</span></div>
-      <div class="sec-h">Fresh openings · paid, checked at send</div>
-      <div class="job"><div><span class="role">Python Development Intern</span> <span class="co">Digitap.ai · Bengaluru</span><span class="new">New</span></div><div class="pay">₹15-18k/mo</div><div class="by">Apply by 12 Nov</div></div>
-      <div class="job"><div><span class="role">Junior Backend Engineer</span> <span class="co">Northwind · Remote</span></div><div class="pay">₹6-9 LPA</div><div class="by">Apply by 30 Oct</div></div>
-      <p class="sign">your magpie,</p>
+      <div class="item"><b>#12 Vector indexes, explained simply</b><small>Why HNSW wins at recall per millisecond, in pictures.</small><span class="u">simonwillison.net</span></div>
+      <div class="item"><b>#14 The $0 LLM stack</b><small>Free tiers compared honestly: what breaks first and when.</small><span class="u">github.com</span></div>
+      <div class="sec-h">Fresh openings · paid, live at send time</div>
+      <div class="job"><div><span class="role">Backend Engineer, GenAI Platform</span> <span class="co">@ RemoteCo</span></div><div class="pay">$120k-$150k</div><div class="by">remoteok.com</div></div>
+      <div class="job"><div><span class="role">Junior Python Developer</span> <span class="co">@ Northwind Labs</span></div><div class="pay">$40k-$65k</div><div class="by">remotive.com</div></div>
+      <p class="sign">- your magpie</p>
       <img class="seal" src="__BRAND__/seal.png" alt="A wax seal stamped with an N">
     </div>
   </div>
