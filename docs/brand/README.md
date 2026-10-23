@@ -1,0 +1,1 @@
+Brand images served at /brand/* from the worker's static bundle (see wrangler.toml [assets]). Rebuilt OG card and avatar are derived from mark.png; magpie.jpg and seal.png are the approved engravings - do not regenerate.
