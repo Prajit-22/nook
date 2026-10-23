@@ -5,6 +5,10 @@ from telegram_api import parse_update
 
 
 class FakeStore:
+    async def create_web_code(self, chat_id, code):
+        self.codes = getattr(self, "codes", {})
+        self.codes[chat_id] = code
+
     def __init__(self):
         self.items = {}
         self.next_id = 1
@@ -88,8 +92,8 @@ def make_bot(store, sent, page=PAGE, feed=FEED, **kwargs):
     async def fetch_jobs_feed():
         return feed
 
-    async def send(chat_id, text):
-        sent.append((chat_id, text))
+    async def send(chat_id, text, url_button=None):
+        sent.append((chat_id, text, url_button))
 
     kwargs.setdefault("job_keywords", "python,backend,intern")
     return botmod.Nook(store=store, send=send, fetch_page=fetch_page,
@@ -234,3 +238,19 @@ async def test_unknown_command_and_help():
     assert "Unknown command" in sent[-1][1]
     await nook.handle_update(update(1, "/help"))
     assert "/note" in sent[-1][1]
+
+
+@pytest.mark.asyncio
+async def test_start_and_web_send_open_buttons():
+    import digest as dg
+    store, sent = FakeStore(), []
+    nook = make_bot(store, sent)
+    await nook.handle_update(update(1, "/start"))
+    assert sent[-1][2] == ("Open Nook", dg.APP_URL + "/app")
+
+    await nook.handle_update(update(1, "/web"))
+    button = sent[-1][2]
+    assert button[0] == "Open Nook" and button[1].startswith(dg.APP_URL + "/app?key=")
+    code = button[1].rsplit("=", 1)[1]
+    assert len(code) == 6
+    assert not set(code) & set("01OIL")  # no ambiguous glyphs
